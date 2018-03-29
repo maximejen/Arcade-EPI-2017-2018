@@ -12,6 +12,7 @@
 	#include <vector>
 
 namespace Arcade {
+	// This class provide a static method to parse the arg sent by the user
 	class ArgParser {
 	public:
 		ArgParser();

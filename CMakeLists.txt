@@ -7,6 +7,6 @@ set(sources core/Color.hpp
         core/Keys.hpp
         core/PixelBox.hpp
         core/TextBox.hpp
-        core/Vect.hpp main.cpp core/ArgParser.cpp core/ArgParser.hpp core/Core.cpp core/Core.hpp)
+        core/Vect.hpp main.cpp core/ArgParser.cpp core/ArgParser.hpp core/Core.cpp core/Core.hpp core/DlLoader.cpp core/DlLoader.hpp)
 
 add_executable(cpp_arcade ${sources})
