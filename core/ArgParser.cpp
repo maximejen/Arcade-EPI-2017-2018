@@ -18,9 +18,10 @@ int Arcade::ArgParser::parseArgs(int argc, char **argv)
 	int ret = 0;
 
 	if (argc != 2)
-		ret = -1;
-	std::ifstream lib(argv[1]);
+		return -1;
+	path = argv[1];
+	std::ifstream lib(path);
 	if (lib.fail())
-		ret = -1;
+		ret = 84;
 	return ret;
 }

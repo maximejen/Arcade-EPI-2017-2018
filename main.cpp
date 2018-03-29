@@ -26,11 +26,15 @@ static const char *HELP_MESSAGE = "BINARY NAME :\n"
 	"\tFor more information, see the documentation of "
 	"the project in the folder.\n";
 
+// here we need to create the core, then launch the program with the lib
+// given in argument by the user
 int main(int argc, char **argv)
 {
-	if (Arcade::ArgParser::parseArgs(argc, argv) == -1) {
+	int ret = 0;
+
+	if ((ret = Arcade::ArgParser::parseArgs(argc, argv)) != 0) {
 		std::cout << HELP_MESSAGE << std::endl;
-		return 84;
+		return ret;
 	}
-	return 0;
+	return ret;
 }
