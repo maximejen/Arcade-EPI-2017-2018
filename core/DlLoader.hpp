@@ -9,6 +9,7 @@
 	#define CPP_ARCADE_DLLOADER_HPP
 
 #include <string>
+#include "../libs/src/IGraphicLib.hpp"
 
 namespace Arcade {
 	// The purpose of this function is to load a lib with dlopen etc ...
@@ -19,8 +20,12 @@ namespace Arcade {
 		DlLoader(std::string libPath);
 		~DlLoader();
 
+		// return the object created by the graphical lib when it has been loaded dlsym on the exntryPoint has been done.
+		IGraphicLib *getLibInstance();
+
 	private:
 		std::string libPath;
+		IGraphicLib *instance;
 	};
 }
 

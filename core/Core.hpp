@@ -6,7 +6,12 @@
 */
 
 #ifndef CPP_ARCADE_CORE_HPP
-#define CPP_ARCADE_CORE_HPP
+	#define CPP_ARCADE_CORE_HPP
+
+	#include <string>
+	#include <vector>
+	#include "../libs/src/IGraphicLib.hpp"
+	#include "../games/src/IGameLib.hpp"
 
 namespace Arcade {
 	// The core will be initialized by the main, then it will handle the program
@@ -15,8 +20,25 @@ namespace Arcade {
 	// Then Core will call the function to render the game and then the lib function to do when the game "asks"
 	class Core {
 	public:
-		Core();
+		// path => the path to the lib given by the user in argument.
+		// Error handling not necessary done, so need to do it then continue or not.
+		Core(std::string path);
 		~Core();
+
+		// Begin of the Core and the program.
+		int startArcade();
+		// find all the graph libs (.so files) in the /libs folder and fill the libraryPathes mem
+		void parseLibDir();
+		// find all the games (.so files) in the /games folder and fill the gamePathes mem
+		void parseGameDir();
+		// check if the path given in argument in the ctr give a good and loadable lib.
+		bool isLibPathCorrect();
+
+	private:
+		std::vector<std::string> libraryPathes;
+		std::vector<std::string> gamePathes;
+		IGraphicLib *actualLib;
+		IGameLib *actualGame;
 	};
 }
 
