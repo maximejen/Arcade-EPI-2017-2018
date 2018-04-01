@@ -25,7 +25,7 @@ namespace Arcade {
 		// load the lib at the libPath given in argument. Then save the instance of the lib in the object. Need to call unloadLib before load a new one.
 		bool loadLib(const std::string &libPath);
 		// check the lib demanded exits and the file is an elf.
-		bool isElfFile(const std::string &libPath);
+		bool isElfFile(const std::string &libPath) const;
 		// this function call dlclose on the lib.
 		bool unloadLib();
 

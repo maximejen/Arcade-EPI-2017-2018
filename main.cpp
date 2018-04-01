@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "core/ArgParser.hpp"
+#include "core/DlLoader.hpp"
 
 static const char *HELP_MESSAGE = "BINARY NAME :\n"
 	"\tarcade\n"
@@ -31,10 +32,14 @@ static const char *HELP_MESSAGE = "BINARY NAME :\n"
 int main(int argc, char **argv)
 {
 	int ret = 0;
+	Arcade::DlLoader loader;
 
 	if ((ret = Arcade::ArgParser::parseArgs(argc, argv)) != 0) {
 		std::cout << HELP_MESSAGE << std::endl;
-		return ret;
+	}
+	if (ret == 0) {
+		loader.loadLib(argv[1]);
+		loader.unloadLib();
 	}
 	return ret;
 }

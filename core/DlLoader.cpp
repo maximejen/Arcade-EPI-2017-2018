@@ -7,7 +7,10 @@
 
 #include <fstream>
 #include <dlfcn.h>
+#include <iostream>
 #include "DlLoader.hpp"
+
+static const char MAGIC[4] = {0x7f, 'E', 'L', 'F'};
 
 Arcade::DlLoader::DlLoader() : libPath(""), handleAddr(),
 			       entryPointResult(), isLibLoaded(false)
@@ -45,17 +48,17 @@ bool Arcade::DlLoader::loadLib(const std::string &libPath)
 	return returnValue;
 }
 
-bool Arcade::DlLoader::isElfFile(const std::string &libPath)
+bool Arcade::DlLoader::isElfFile(const std::string &libPath) const
 {
 	std::ifstream lib(libPath);
-	char magic[4];
+	char magic[5] = {0, 0, 0, 0, 0};
 	std::string tmp;
 
 	if (lib.fail())
 		return false;
 	lib.read(magic, 4);
 	tmp = magic;
-	return !(tmp != "0x7fELF");
+	return tmp == MAGIC;
 }
 
 bool Arcade::DlLoader::unloadLib()
