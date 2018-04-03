@@ -68,4 +68,5 @@ bool Arcade::GraphLibLoader::unloadLib()
 	this->handleAddr = nullptr;
 	this->isLibLoaded = false;
 	this->entryPointResult = nullptr;
+	return true;
 }

@@ -68,4 +68,5 @@ bool Arcade::GameLibLoader::unloadLib()
 	this->handleAddr = nullptr;
 	this->isLibLoaded = false;
 	this->entryPointResult = nullptr;
+	return true;
 }

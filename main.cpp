@@ -8,6 +8,7 @@
 #include <iostream>
 #include "core/ArgParser.hpp"
 #include "core/GraphLibLoader.hpp"
+#include "core/Core.hpp"
 
 static const char *HELP_MESSAGE = "BINARY NAME :\n"
 	"\tarcade\n"
@@ -32,14 +33,13 @@ static const char *HELP_MESSAGE = "BINARY NAME :\n"
 int main(int argc, char **argv)
 {
 	int ret = 0;
-	Arcade::GraphLibLoader loader;
 
 	if ((ret = Arcade::ArgParser::parseArgs(argc, argv)) != 0) {
 		std::cout << HELP_MESSAGE << std::endl;
 	}
 	if (ret == 0) {
-		loader.loadLib(argv[1]);
-		loader.unloadLib();
+		Arcade::Core core;
+		return core.startArcade();
 	}
 	return ret;
 }

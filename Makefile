@@ -7,9 +7,13 @@
 
 SRC		=	main.cpp					\
 			core/ArgParser.cpp				\
-			core/GraphLibLoader.cpp
+			core/GraphLibLoader.cpp				\
+			core/Core.cpp					\
+			core/GameLibLoader.cpp				\
+			core/LogicException.cpp				\
+			core/PixelBox.cpp
 
-CXXFLAGS	=	-I./ -I./core -I./libs -I./games
+CXXFLAGS	=	-I./ -I./core -I./libs -I./games -W -Wall -Wextra -g -std=c++11
 
 LIBFLAGS	=	-ldl
 

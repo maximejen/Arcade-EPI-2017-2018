@@ -12,6 +12,8 @@
 	#include <vector>
 	#include "../libs/src/IGraphicLib.hpp"
 	#include "../games/src/IGameLib.hpp"
+	#include "GameLibLoader.hpp"
+	#include "GraphLibLoader.hpp"
 
 namespace Arcade {
 	// The core will be initialized by the main, then it will handle the program
@@ -24,7 +26,6 @@ namespace Arcade {
 	public:
 		// path => the path to the lib given by the user in argument.
 		// Error handling not necessary done, so need to do it then continue or not.
-		explicit Core(const std::string &path);
 		Core();
 		~Core();
 
@@ -34,17 +35,20 @@ namespace Arcade {
 		void parseLibDir();
 		// find all the games (.so files) in the /games folder and fill the gamePathes mem
 		void parseGameDir();
-		IGraphicLib *getActualLib() const;
-		void setActualLib(IGraphicLib *actualLib);
-		IGameLib *getActualGame() const;
-		void setActualGame(IGameLib *actualGame);
-
+		const GameLibLoader &getGameLoader() const;
+		void setGameLoader(const GameLibLoader &gameLoader);
+		const GraphLibLoader &getGraphLoader() const;
+		void setGraphLoader(const GraphLibLoader &graphLoader);
 
 	private:
+		int arcadeLoop(IGraphicLib *);
+
 		std::vector<std::string> libraryPathes;
 		std::vector<std::string> gamePathes;
-		IGraphicLib *actualLib;
-		IGameLib *actualGame;
+		GameLibLoader gameLoader;
+		GraphLibLoader graphLoader;
+		int selectedGame;
+		int selectedLib;
 	};
 }
 
