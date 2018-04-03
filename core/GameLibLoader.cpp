@@ -2,37 +2,37 @@
 ** EPITECH PROJECT, 2018
 ** cpp_arcade
 ** File description:
-** DlLoader.cpp
+** GameLibLoader.cpp
 */
 
 #include <fstream>
 #include <dlfcn.h>
 #include <iostream>
-#include "DlLoader.hpp"
+#include "GameLibLoader.hpp"
 
 static const char MAGIC[4] = {0x7f, 'E', 'L', 'F'};
 
-Arcade::DlLoader::DlLoader() : libPath(""), handleAddr(),
-			       entryPointResult(), isLibLoaded(false)
+Arcade::GameLibLoader::GameLibLoader() : libPath(""), handleAddr(),
+					   entryPointResult(), isLibLoaded(false)
 {
 	this->handleAddr = nullptr;
 	this->entryPointResult = nullptr;
 }
 
-Arcade::DlLoader::~DlLoader()
+Arcade::GameLibLoader::~GameLibLoader()
 {
 	this->unloadLib();
 }
 
-Arcade::IGraphicLib *Arcade::DlLoader::getLibInstance()
+Arcade::IGameLib *Arcade::GameLibLoader::getLibInstance()
 {
 	return this->entryPointResult;
 }
 
-bool Arcade::DlLoader::loadLib(const std::string &libPath)
+bool Arcade::GameLibLoader::loadLib(const std::string &libPath)
 {
 	std::string tmp;
-	Arcade::IGraphicLib *(*ret)() = nullptr;
+	Arcade::IGameLib *(*ret)() = nullptr;
 	bool returnValue = false;
 
 	if (!this->isElfFile(libPath))
@@ -48,7 +48,7 @@ bool Arcade::DlLoader::loadLib(const std::string &libPath)
 	return returnValue;
 }
 
-bool Arcade::DlLoader::isElfFile(const std::string &libPath) const
+bool Arcade::GameLibLoader::isElfFile(const std::string &libPath) const
 {
 	std::ifstream lib(libPath);
 	char magic[5] = {0, 0, 0, 0, 0};
@@ -61,7 +61,7 @@ bool Arcade::DlLoader::isElfFile(const std::string &libPath) const
 	return tmp == MAGIC;
 }
 
-bool Arcade::DlLoader::unloadLib()
+bool Arcade::GameLibLoader::unloadLib()
 {
 	if (this->handleAddr != nullptr)
 		dlclose(this->handleAddr);

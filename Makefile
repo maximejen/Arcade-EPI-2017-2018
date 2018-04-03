@@ -7,7 +7,7 @@
 
 SRC		=	main.cpp					\
 			core/ArgParser.cpp				\
-			core/DlLoader.cpp
+			core/GraphLibLoader.cpp
 
 CXXFLAGS	=	-I./ -I./core -I./libs -I./games
 

@@ -6,7 +6,7 @@ set(sources core/Color.hpp
         core/Keys.hpp
         core/PixelBox.hpp
         core/TextBox.hpp
-        core/Vect.hpp main.cpp core/ArgParser.cpp core/ArgParser.hpp core/Core.cpp core/Core.hpp core/DlLoader.cpp core/DlLoader.hpp)
+        core/Vect.hpp main.cpp core/ArgParser.cpp core/ArgParser.hpp core/Core.cpp core/Core.hpp core/GraphLibLoader.cpp core/GraphLibLoader.hpp core/GameLibLoader.cpp core/GameLibLoader.hpp)
 
 set(lib_test_sources libs/src/test/entryPoint.cpp)
 

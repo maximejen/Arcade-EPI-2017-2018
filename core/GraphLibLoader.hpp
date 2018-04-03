@@ -15,10 +15,10 @@ namespace Arcade {
 	// The purpose of this function is to load a lib with dlopen etc ...
 	// Then get the instance of the IGraphicLib returned by the entryPoint
 	// Of the loaded lib.
-	class DlLoader {
+	class GraphLibLoader {
 	public:
-		DlLoader();
-		~DlLoader();
+		GraphLibLoader();
+		~GraphLibLoader();
 
 		// return the object created by the graphical lib when it has been loaded dlsym on the exntryPoint has been done.
 		IGraphicLib *getLibInstance();
