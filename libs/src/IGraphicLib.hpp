@@ -29,7 +29,7 @@ namespace Arcade {
 		virtual void closeRenderer() = 0;
 
 		// Opens the window => start loop
-		virtual void openRenderer() = 0;
+		virtual void openRenderer(std::string const &title) = 0;
 
 		// Clears the screen
 		virtual void clearWindow() = 0;
@@ -66,9 +66,9 @@ namespace Arcade {
 		virtual Vect<size_t> getScreenSize() const = 0;
 
 		// get the Y max of the windows
-		virtual int getMaxY() const = 0;
+		virtual size_t getMaxY() const = 0;
 
 		// get the X max of the windows
-		virtual int getMaxX() const = 0;
+		virtual size_t getMaxX() const = 0;
 	};
 };
