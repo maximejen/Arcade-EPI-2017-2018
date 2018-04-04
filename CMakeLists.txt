@@ -20,7 +20,7 @@ set(sources
         core/LogicException.cpp
         core/LogicException.hpp
         core/TextBox.cpp
-        core/PixelBox.cpp core/Color.cpp)
+        core/PixelBox.cpp core/Color.cpp libs/src/SDL/LibSDL.cpp libs/src/SDL/LibSDL.hpp)
 
 set(lib_ncurse_sources libs/src/ncurses/entryPoint.cpp libs/src/ncurses/LibNcurses.cpp libs/src/ncurses/LibNcurses.hpp)
 

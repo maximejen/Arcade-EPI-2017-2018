@@ -10,6 +10,7 @@
 #include <string>
 #include "../../core/Vect.hpp"
 #include "../../core/PixelBox.hpp"
+#include "../../core/Color.hpp"
 #include "../../core/TextBox.hpp"
 #include "../../core/Keys.hpp"
 

@@ -14,18 +14,21 @@
 namespace Arcade {
 	class LibNcurses : public IGraphicLib {
 	public:
-		LibNcurses(Vect<size_t> screenSize);
+		LibNcurses(Vect<size_t> screenSize, const std::string &title);
 		~LibNcurses() override;
 
-		bool isOpen() const;
+		bool isOpen() const override;
 		void closeRenderer() override;
 		void openRenderer(std::string const &title) override;
 		void clearWindow() override;
 		void refreshWindow() override;
 
-		void drawPixelBox(PixelBox &);
+		void drawPixelBox(PixelBox &) override;
+		void drawChar(int x, int y, char c, const Color &color);
+		const char *convertColor(const Color &color, bool front = false);
+		const char *resetColor();
 
-		void drawText(TextBox &);
+		void drawText(TextBox &) override;
 
 		bool pollEvents() override;
 		Keys getLastEvent() override;
@@ -41,6 +44,8 @@ namespace Arcade {
 		Vect<size_t> screenSize;
 		WINDOW *window;
 	};
+
+	std::map<int, Arcade::Keys> NCURSE_KEYS;
 }
 
 
