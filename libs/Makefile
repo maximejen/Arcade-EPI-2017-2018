@@ -6,13 +6,13 @@
 ##
 
 all: $(OBJ)
-	make -sC ./src/test
+	make -sC ./src/ncurses
 
 clean:
-	make clean -sC ./src/test
+	make clean -sC ./src/ncurses
 
 fclean: clean
-	make fclean -sC ./src/test
+	make fclean -sC ./src/ncurses
 
 re: fclean all
 

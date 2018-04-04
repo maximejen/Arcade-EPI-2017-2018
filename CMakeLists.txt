@@ -22,7 +22,7 @@ set(sources
         core/TextBox.cpp
         core/PixelBox.cpp core/Color.cpp)
 
-set(lib_test_sources libs/src/test/entryPoint.cpp)
+set(lib_test_sources libs/src/ncurses/entryPoint.cpp)
 
 set(CMAKE_EXE_LINKER_FLAGS "-ldl")
 set(CMAKE_CXX_STANDARD 11)

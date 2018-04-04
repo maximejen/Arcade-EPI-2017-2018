@@ -93,6 +93,7 @@ int Arcade::Core::arcadeLoop(IGraphicLib *graphLib)
 		// Todo : check if event concerns the Core, then declare the Event to the Game
 	}
 	// Todo : Update and then refresh the game.
+	return 1;
 }
 
 const Arcade::GameLibLoader &Arcade::Core::getGameLoader() const
