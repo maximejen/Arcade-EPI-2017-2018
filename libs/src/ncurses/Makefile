@@ -7,9 +7,10 @@
 
 CC 		= 	g++
 RM 		= 	rm -f
-TARGET_LIB 	= 	libtest.so
+TARGET_LIB 	= 	lib_arcade_ncurses.so
 
-SRCS		= 	./entryPoint.cpp
+SRCS		= 	./entryPoint.cpp			\
+			./LibNcurses.cpp
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 

@@ -16,13 +16,13 @@ void enter()
 {
 	/* Again, it's for example, use the class of your lib */
 //	ret = new Arcade::SFML;
-	std::cout << "Constructor of the testLib" << std::endl;
+	std::cout << "Constructor of the ncurses" << std::endl;
 }
 
 __attribute__((destructor))
 void out()
 {
-	std::cout << "Desctructor of the testLib" << std::endl;
+	std::cout << "Desctructor of the ncurses" << std::endl;
 //	delete ret;
 }
 
@@ -30,6 +30,6 @@ void out()
 extern "C" Arcade::IGraphicLib *entryPoint()
 {
 //	return ret;
-	std::cout << "entryPoint of the testLib" << std::endl;
+	std::cout << "entryPoint of the ncurses" << std::endl;
 	return nullptr;
 }
