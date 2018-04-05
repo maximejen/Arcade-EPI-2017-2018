@@ -11,10 +11,13 @@
 	#include <queue>
 	#include <ncurses.h>
 	#include <map>
+	#include <list>
 	#include <sys/ioctl.h>
 	#include "../IGraphicLib.hpp"
 
 namespace Arcade {
+	#define T_VALUE(x) (x * 3.9)
+
 	class LibNcurses : public IGraphicLib {
 	public:
 		LibNcurses(Vect<size_t> screenSize, const std::string &title);
@@ -29,9 +32,9 @@ namespace Arcade {
 		void refreshWindow() override;
 
 		void drawPixelBox(PixelBox &) override;
-		void drawChar(int x, int y, char c, const Color &color);
-		const char *convertColor(const Color &color, bool front = false);
-		const char *resetColor();
+		void drawPixel(int x, int y, char c, const Color &color);
+		void init_ncurse_color(const Color &, const Color &);
+		void resetColor();
 
 		void drawText(TextBox &) override;
 
@@ -39,7 +42,7 @@ namespace Arcade {
 		Keys getLastEvent() override;
 		void clearEvents() override;
 
-		Vect<size_t> getScreenSize() const;
+		Vect<size_t> getScreenSize() const override;
 
 		size_t getMaxX() const override;
 		size_t getMaxY() const override;
@@ -48,6 +51,7 @@ namespace Arcade {
 		std::queue<Arcade::Keys> events;
 		Vect<size_t> screenSize;
 		WINDOW *window;
+		std::vector<std::pair<Arcade::Color, Arcade::Color>> colors;
 	};
 }
 

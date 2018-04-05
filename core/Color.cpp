@@ -67,3 +67,16 @@ Arcade::Color::operator unsigned char *()
 {
 	return &this->_red;
 }
+
+bool Arcade::Color::operator!=(const Color &ocolor)
+{
+	bool ret = false;
+
+	if (this->getRed() != ocolor.getRed())
+		ret = true;
+	else if (this->getGreen() != ocolor.getGreen())
+		ret = true;
+	else if (this->getBlue() != ocolor.getBlue())
+		ret = true;
+	return ret;
+}

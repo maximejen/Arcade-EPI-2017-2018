@@ -80,9 +80,6 @@ int Arcade::Core::startArcade()
 	this->graphLoader.loadLib(this->libraryPathes[this->selectedGame]);
 //	this->gameLoader.loadLib(this->gamePathes[this->selectedGame]);
 	auto graphLib = this->graphLoader.getLibInstance();
-	Arcade::TextBox textBox("test", {1, 1});
-	graphLib->drawText(textBox);
-	graphLib->refreshWindow();
 	while (1) {
 		this->arcadeLoop(graphLib);
 	}
@@ -95,7 +92,13 @@ int Arcade::Core::arcadeLoop(IGraphicLib *graphLib)
 		std::cout << "event : " << graphLib->getLastEvent() << std::endl;
 		// Todo : check if event concerns the Core, then declare the Event to the Game
 	}
-	// Todo : Update and then refresh the game.
+	graphLib->clearWindow();
+	Arcade::PixelBox pixelBox({20, 10}, {3, 3}, {255, 255, 255, 255});
+	pixelBox.putPixel(30, {30, 30, 30, 255});
+	graphLib->drawPixelBox(pixelBox);
+	Arcade::TextBox textBox("test", {1, 1});
+	graphLib->drawText(textBox);
+	graphLib->refreshWindow();
 	return 1;
 }
 

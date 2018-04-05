@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <sys/ioctl.h>
 #include <iostream>
+#include <algorithm>
 #include "LibNcurses.hpp"
 
 static const std::unordered_map<int, Arcade::Keys> NCURSES_KEYS = {
@@ -48,7 +49,7 @@ static const std::unordered_map<int, Arcade::Keys> NCURSES_KEYS = {
 	{KEY_DL,        Arcade::DELETE},
 	{KEY_BACKSPACE, Arcade::BACKSPACE},
 	{KEY_BTAB,      Arcade::TAB},
-	{27,            Arcade::ESC},
+	{36,            Arcade::ESC},
 	{KEY_MOUSE,     Arcade::MOUSELEFT},
 	{KEY_MOUSE,     Arcade::MOUSERIGHT}
 };
@@ -69,9 +70,10 @@ Arcade::LibNcurses::~LibNcurses()
 
 bool Arcade::LibNcurses::pollEvents()
 {
+	timeout(10);
 	int event = getch();
 
-	if (event != 0) {
+	if (event != 0 && event != ERR) {
 		this->events.push(NCURSES_KEYS.at(event));
 	}
 	return !this->events.empty();
@@ -136,6 +138,9 @@ void Arcade::LibNcurses::openRenderer(std::string const &title)
 	ioctl(0, TIOCGWINSZ, &size);
 	this->screenSize.setX(size.ws_col);
 	this->screenSize.setY(size.ws_row);
+	start_color();
+	cbreak();
+	noecho();
 }
 
 void Arcade::LibNcurses::drawPixelBox(Arcade::PixelBox &box)
@@ -145,48 +150,52 @@ void Arcade::LibNcurses::drawPixelBox(Arcade::PixelBox &box)
 			auto px = static_cast<int>(box.getX() + x);
 			auto py = static_cast<int>(box.getY() + y);
 			Color value = box.getPixel(px + py * box.getWidth());
-			this->drawChar(px, py, ' ', value);
+			this->drawPixel(px, py, ' ', value);
 		}
 	}
 }
 
 void Arcade::LibNcurses::drawText(Arcade::TextBox &text)
 {
-	mvprintw(static_cast<int>(text.getX()), static_cast<int>(text.getY()),
-		 "%s%s%s%s",
-		 this->convertColor(text.getBackgroundColor()),
-		 this->convertColor(text.getColor(), true), text.getValue(),
-		 this->resetColor());
+	this->init_ncurse_color(text.getColor(), text.getBackgroundColor());
+	mvprintw(static_cast<int>(text.getY()), static_cast<int>(text.getX()),
+		 "%s", text.getValue().c_str());
+	this->resetColor();
 }
 
-void Arcade::LibNcurses::drawChar(int x, int y, char c,
+void Arcade::LibNcurses::drawPixel(int x, int y, char c,
 	const Arcade::Color &color)
 {
-	mvprintw(x, y, "%s%c%s", this->convertColor(color), c,
-		 this->resetColor());
+	this->init_ncurse_color(color, color);
+	mvprintw(y, x, "%c", c);
+	this->resetColor();
 }
 
-const char *Arcade::LibNcurses::convertColor(const Arcade::Color &color,
-	bool front)
+void Arcade::LibNcurses::init_ncurse_color(const Arcade::Color &c,
+	const Arcade::Color &bc)
 {
-	std::string col;
+	std::pair<Arcade::Color, Arcade::Color> pair(c, bc);
+	size_t i;
 
-	if (front)
-		col += "\e[38;5";
-	else
-		col += "\e[48;5";
-	col += color.getRed();
-	col += ";";
-	col += color.getGreen();
-	col += ";";
-	col += color.getBlue();
-	col += "m";
-	return col.c_str();
+	for (i = 0 ; i < this->colors.size() &&
+		pair.first != this->colors[i].first &&
+		pair.second != this->colors[i].second; i++);
+	if (i == this->colors.size()) {
+		this->colors.emplace_back(c, bc);
+	}
+	init_color(COLOR_RED, static_cast<short>(T_VALUE(c.getRed())),
+		   static_cast<short>(T_VALUE(c.getGreen())),
+		   static_cast<short>(T_VALUE(c.getBlue())));
+	init_color(COLOR_BLUE, static_cast<short>(T_VALUE(bc.getRed())),
+		   static_cast<short>(T_VALUE(bc.getGreen())),
+		   static_cast<short>(T_VALUE(bc.getBlue())));
+	init_pair(static_cast<short>(i), COLOR_RED, COLOR_BLUE);
+	attron(COLOR_PAIR(1));
 }
 
-const char *Arcade::LibNcurses::resetColor()
+void Arcade::LibNcurses::resetColor()
 {
-	return "\e[0m";
+	attroff(COLOR_PAIR(1));
 }
 
 std::string Arcade::LibNcurses::getName() const

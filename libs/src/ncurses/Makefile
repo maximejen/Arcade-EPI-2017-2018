@@ -10,7 +10,10 @@ RM 		= 	rm -f
 TARGET_LIB 	= 	lib_arcade_ncurses.so
 
 SRCS		= 	./entryPoint.cpp			\
-			./LibNcurses.cpp
+			./LibNcurses.cpp			\
+			./TextBox.cpp				\
+			./PixelBox.cpp				\
+			./Color.cpp
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 
