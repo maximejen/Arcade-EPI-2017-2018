@@ -14,9 +14,9 @@ SRCS		= 	./entryPoint.cpp			\
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 
-CXXFLAGS 	= 	-I.
+CXXFLAGS 	= 	-I. -I ../../../core
 CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC
-LDFLAGS      	=	-shared
+LDFLAGS      	=	-shared -lncurses
 
 all: $(TARGET_LIB)
 

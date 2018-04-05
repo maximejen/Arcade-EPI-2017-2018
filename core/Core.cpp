@@ -15,8 +15,9 @@
 
 static const std::regex REGEX("^[a-z0-9]*.so");
 
-Arcade::Core::Core() : selectedGame(0), selectedLib(0)
+Arcade::Core::Core(const std::string &libPath) : selectedGame(0), selectedLib(0)
 {
+	this->libraryPathes.push_back(libPath);
 	this->parseLibDir();
 	this->parseGameDir();
 }
@@ -43,7 +44,6 @@ void Arcade::Core::parseLibDir()
 		    std::find(this->libraryPathes.begin(),
 			      this->libraryPathes.end(), name) ==
 		    this->libraryPathes.end()) {
-			std::cout << name << std::endl;
 			this->libraryPathes.push_back(name);
 		}
 		free(namelist[i]);
@@ -67,7 +67,6 @@ void Arcade::Core::parseGameDir()
 		    std::find(this->libraryPathes.begin(),
 			      this->libraryPathes.end(), name) ==
 		    this->libraryPathes.end()) {
-			std::cout << name << std::endl;
 			this->gamePathes.push_back(name);
 		}
 		free(namelist[i]);
@@ -76,11 +75,14 @@ void Arcade::Core::parseGameDir()
 
 int Arcade::Core::startArcade()
 {
-	if (this->libraryPathes.empty() || this->gamePathes.empty())
-		throw Arcade::LogicException("Error while parsing libs.");
-	this->graphLoader.loadLib(this->libraryPathes[this->selectedLib]);
-	this->gameLoader.loadLib(this->gamePathes[this->selectedGame]);
+//	if (this->libraryPathes.empty() || this->gamePathes.empty())
+//		throw Arcade::LogicException("Error while parsing libs.");
+	this->graphLoader.loadLib(this->libraryPathes[this->selectedGame]);
+//	this->gameLoader.loadLib(this->gamePathes[this->selectedGame]);
 	auto graphLib = this->graphLoader.getLibInstance();
+	Arcade::TextBox textBox("test", {1, 1});
+	graphLib->drawText(textBox);
+	graphLib->refreshWindow();
 	while (1) {
 		this->arcadeLoop(graphLib);
 	}
@@ -90,6 +92,7 @@ int Arcade::Core::startArcade()
 int Arcade::Core::arcadeLoop(IGraphicLib *graphLib)
 {
 	while (graphLib->pollEvents()) {
+		std::cout << "event : " << graphLib->getLastEvent() << std::endl;
 		// Todo : check if event concerns the Core, then declare the Event to the Game
 	}
 	// Todo : Update and then refresh the game.

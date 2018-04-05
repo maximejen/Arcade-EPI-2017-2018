@@ -9,6 +9,9 @@
 	#define CPP_ARCADE_LIBNCURSES_HPP_
 
 	#include <queue>
+	#include <ncurses.h>
+	#include <map>
+	#include <sys/ioctl.h>
 	#include "../IGraphicLib.hpp"
 
 namespace Arcade {
@@ -16,6 +19,8 @@ namespace Arcade {
 	public:
 		LibNcurses(Vect<size_t> screenSize, const std::string &title);
 		~LibNcurses() override;
+
+		std::string getName() const override;
 
 		bool isOpen() const override;
 		void closeRenderer() override;
@@ -34,7 +39,7 @@ namespace Arcade {
 		Keys getLastEvent() override;
 		void clearEvents() override;
 
-		Vect<size_t> getScreenSize();
+		Vect<size_t> getScreenSize() const;
 
 		size_t getMaxX() const override;
 		size_t getMaxY() const override;
@@ -44,8 +49,6 @@ namespace Arcade {
 		Vect<size_t> screenSize;
 		WINDOW *window;
 	};
-
-	std::map<int, Arcade::Keys> NCURSE_KEYS;
 }
 
 

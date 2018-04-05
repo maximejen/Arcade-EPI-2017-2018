@@ -6,38 +6,39 @@
 */
 
 #include <ncurses.h>
-#include <map>
+#include <unordered_map>
 #include <sys/ioctl.h>
+#include <iostream>
 #include "LibNcurses.hpp"
 
-static const std::map<int, Arcade::Keys> NCURSES_KEYS = {
+static const std::unordered_map<int, Arcade::Keys> NCURSES_KEYS = {
 	{0,             Arcade::NONE},
-	{'A',           Arcade::A},
-	{'B',           Arcade::B},
-	{'C',           Arcade::C},
-	{'D',           Arcade::D},
-	{'E',           Arcade::E},
-	{'F',           Arcade::F},
-	{'G',           Arcade::G},
-	{'H',           Arcade::H},
-	{'I',           Arcade::I},
-	{'J',           Arcade::J},
-	{'K',           Arcade::K},
-	{'L',           Arcade::L},
-	{'M',           Arcade::M},
-	{'N',           Arcade::N},
-	{'O',           Arcade::O},
-	{'P',           Arcade::P},
-	{'Q',           Arcade::Q},
-	{'R',           Arcade::R},
-	{'S',           Arcade::S},
-	{'T',           Arcade::T},
-	{'U',           Arcade::U},
-	{'V',           Arcade::V},
-	{'W',           Arcade::W},
-	{'X',           Arcade::X},
-	{'Y',           Arcade::Y},
-	{'Z',           Arcade::Z},
+	{'a',           Arcade::A},
+	{'b',           Arcade::B},
+	{'c',           Arcade::C},
+	{'d',           Arcade::D},
+	{'e',           Arcade::E},
+	{'f',           Arcade::F},
+	{'g',           Arcade::G},
+	{'h',           Arcade::H},
+	{'i',           Arcade::I},
+	{'j',           Arcade::J},
+	{'k',           Arcade::K},
+	{'l',           Arcade::L},
+	{'m',           Arcade::M},
+	{'n',           Arcade::N},
+	{'o',           Arcade::O},
+	{'p',           Arcade::P},
+	{'q',           Arcade::Q},
+	{'r',           Arcade::R},
+	{'s',           Arcade::S},
+	{'t',           Arcade::T},
+	{'u',           Arcade::U},
+	{'v',           Arcade::V},
+	{'w',           Arcade::W},
+	{'x',           Arcade::X},
+	{'y',           Arcade::Y},
+	{'z',           Arcade::Z},
 	{KEY_LEFT,      Arcade::LEFT},
 	{KEY_RIGHT,     Arcade::RIGHT},
 	{KEY_UP,        Arcade::UP},
@@ -89,13 +90,8 @@ void Arcade::LibNcurses::clearEvents()
 		this->events.pop();
 }
 
-Arcade::Vect<size_t> Arcade::LibNcurses::getScreenSize()
+Arcade::Vect<size_t> Arcade::LibNcurses::getScreenSize() const
 {
-	struct winsize size{};
-
-	ioctl(0, TIOCGWINSZ, &size);
-	this->screenSize.setX(size.ws_col);
-	this->screenSize.setY(size.ws_row);
 	return this->screenSize;
 }
 
@@ -136,6 +132,10 @@ void Arcade::LibNcurses::openRenderer(std::string const &title)
 	this->window = initscr();
 	curs_set(0);
 	keypad(this->window, true);
+	struct winsize size{};
+	ioctl(0, TIOCGWINSZ, &size);
+	this->screenSize.setX(size.ws_col);
+	this->screenSize.setY(size.ws_row);
 }
 
 void Arcade::LibNcurses::drawPixelBox(Arcade::PixelBox &box)
@@ -187,4 +187,9 @@ const char *Arcade::LibNcurses::convertColor(const Arcade::Color &color,
 const char *Arcade::LibNcurses::resetColor()
 {
 	return "\e[0m";
+}
+
+std::string Arcade::LibNcurses::getName() const
+{
+	return "Ncurses";
 }

@@ -11,7 +11,9 @@ SRC		=	main.cpp					\
 			core/Core.cpp					\
 			core/GameLibLoader.cpp				\
 			core/LogicException.cpp				\
-			core/PixelBox.cpp
+			core/PixelBox.cpp				\
+			core/TextBox.cpp				\
+			core/Color.cpp
 
 CXXFLAGS	=	-I./ -I./core -I./libs -I./games -W -Wall -Wextra -g -std=c++11
 
@@ -24,24 +26,24 @@ NAME		=	arcade
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	make -sC ./libs
+	make -C ./libs
 	g++ -o $(NAME) $(OBJ) $(LIBFLAGS)
 
 core: $(OBJ)
 	g++ -o $(NAME) $(OBJ) $(LIBFLAGS)
 
 graphicals:
-	make -sC ./libs
+	make -C ./libs
 
 games:
 	echo "try to compile the games"
 
 clean:
-	make clean -sC ./libs
+	make clean -C ./libs
 	rm -rf $(OBJ)
 
 fclean: clean
-	make fclean -sC ./libs
+	make fclean -C ./libs
 	rm -rf $(NAME)
 
 re: fclean all

@@ -36,7 +36,7 @@ bool Arcade::GraphLibLoader::loadLib(const std::string &libPath)
 	bool returnValue = false;
 
 	if (!this->isElfFile(libPath))
-		return false;
+		return returnValue;
 	if ((this->handleAddr = dlopen(libPath.c_str(), RTLD_LAZY))) {
 		returnValue = true;
 		*(void **) (&ret) = dlsym(this->handleAddr, "entryPoint");
@@ -45,6 +45,8 @@ bool Arcade::GraphLibLoader::loadLib(const std::string &libPath)
 		else
 			returnValue = false;
 	}
+	else
+		std::cout << dlerror() << std::endl;
 	return returnValue;
 }
 

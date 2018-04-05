@@ -26,7 +26,7 @@ namespace Arcade {
 	public:
 		// path => the path to the lib given by the user in argument.
 		// Error handling not necessary done, so need to do it then continue or not.
-		Core();
+		explicit Core(const std::string &libPath);
 		~Core();
 
 		// Begin of the Core and the program.

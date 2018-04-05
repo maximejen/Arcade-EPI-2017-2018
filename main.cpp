@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 		std::cout << HELP_MESSAGE << std::endl;
 	}
 	if (ret == 0) {
-		Arcade::Core core;
+		Arcade::Core core(argv[1]);
 		return core.startArcade();
 	}
 	return ret;

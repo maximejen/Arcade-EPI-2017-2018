@@ -12,6 +12,7 @@ namespace Arcade {
 	public:
 		Color(unsigned char red = 0, unsigned char green = 0,
 			unsigned char blue = 0, unsigned char alpha = 0);
+		~Color() = default;
 		void setColor(unsigned char red = 0, unsigned char green = 0,
 			unsigned char blue = 0, unsigned char alpha = 0);
 		unsigned char getRed() const;
