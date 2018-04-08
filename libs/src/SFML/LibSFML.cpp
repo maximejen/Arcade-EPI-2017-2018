@@ -10,57 +10,62 @@
 #include "LibSFML.hpp"
 
 static const std::unordered_map<sf::Keyboard::Key, Arcade::Keys> SFML_KEYS = {
-	{sf::Keyboard::Unknown,   Arcade::NONE},
-	{sf::Keyboard::A,         Arcade::A},
-	{sf::Keyboard::B,         Arcade::B},
-	{sf::Keyboard::C,         Arcade::C},
-	{sf::Keyboard::D,         Arcade::D},
-	{sf::Keyboard::E,         Arcade::E},
-	{sf::Keyboard::F,         Arcade::F},
-	{sf::Keyboard::G,         Arcade::G},
-	{sf::Keyboard::H,         Arcade::H},
-	{sf::Keyboard::I,         Arcade::I},
-	{sf::Keyboard::J,         Arcade::J},
-	{sf::Keyboard::K,         Arcade::K},
-	{sf::Keyboard::L,         Arcade::L},
-	{sf::Keyboard::M,         Arcade::M},
-	{sf::Keyboard::N,         Arcade::N},
-	{sf::Keyboard::O,         Arcade::O},
-	{sf::Keyboard::P,         Arcade::P},
-	{sf::Keyboard::Q,         Arcade::Q},
-	{sf::Keyboard::R,         Arcade::R},
-	{sf::Keyboard::S,         Arcade::S},
-	{sf::Keyboard::T,         Arcade::T},
-	{sf::Keyboard::U,         Arcade::U},
-	{sf::Keyboard::V,         Arcade::V},
-	{sf::Keyboard::W,         Arcade::W},
-	{sf::Keyboard::X,         Arcade::X},
-	{sf::Keyboard::Y,         Arcade::Y},
-	{sf::Keyboard::Z,         Arcade::Z},
-	{sf::Keyboard::Left,      Arcade::LEFT},
-	{sf::Keyboard::Right,     Arcade::RIGHT},
-	{sf::Keyboard::Up,        Arcade::UP},
-	{sf::Keyboard::Down,      Arcade::DOWN},
-	{sf::Keyboard::Return,    Arcade::ENTER},
-	{sf::Keyboard::Space,     Arcade::SPACE},
-	{sf::Keyboard::Delete,    Arcade::DELETE},
-	{sf::Keyboard::BackSpace, Arcade::BACKSPACE},
-	{sf::Keyboard::Tab,       Arcade::TAB},
-	{sf::Keyboard::Escape,    Arcade::ESC},
-	{sf::Keyboard::M,         Arcade::MOUSELEFT},
-	{sf::Keyboard::M,         Arcade::MOUSERIGHT}
+	{sf::Keyboard::Unknown,   Arcade::Keys::NONE},
+	{sf::Keyboard::A,         Arcade::Keys::A},
+	{sf::Keyboard::B,         Arcade::Keys::B},
+	{sf::Keyboard::C,         Arcade::Keys::C},
+	{sf::Keyboard::D,         Arcade::Keys::D},
+	{sf::Keyboard::E,         Arcade::Keys::E},
+	{sf::Keyboard::F,         Arcade::Keys::F},
+	{sf::Keyboard::G,         Arcade::Keys::G},
+	{sf::Keyboard::H,         Arcade::Keys::H},
+	{sf::Keyboard::I,         Arcade::Keys::I},
+	{sf::Keyboard::J,         Arcade::Keys::J},
+	{sf::Keyboard::K,         Arcade::Keys::K},
+	{sf::Keyboard::L,         Arcade::Keys::L},
+	{sf::Keyboard::M,         Arcade::Keys::M},
+	{sf::Keyboard::N,         Arcade::Keys::N},
+	{sf::Keyboard::O,         Arcade::Keys::O},
+	{sf::Keyboard::P,         Arcade::Keys::P},
+	{sf::Keyboard::Q,         Arcade::Keys::Q},
+	{sf::Keyboard::R,         Arcade::Keys::R},
+	{sf::Keyboard::S,         Arcade::Keys::S},
+	{sf::Keyboard::T,         Arcade::Keys::T},
+	{sf::Keyboard::U,         Arcade::Keys::U},
+	{sf::Keyboard::V,         Arcade::Keys::V},
+	{sf::Keyboard::W,         Arcade::Keys::W},
+	{sf::Keyboard::X,         Arcade::Keys::X},
+	{sf::Keyboard::Y,         Arcade::Keys::Y},
+	{sf::Keyboard::Z,         Arcade::Keys::Z},
+	{sf::Keyboard::Left,      Arcade::Keys::LEFT},
+	{sf::Keyboard::Right,     Arcade::Keys::RIGHT},
+	{sf::Keyboard::Up,        Arcade::Keys::UP},
+	{sf::Keyboard::Down,      Arcade::Keys::DOWN},
+	{sf::Keyboard::Return,    Arcade::Keys::ENTER},
+	{sf::Keyboard::Space,     Arcade::Keys::SPACE},
+	{sf::Keyboard::Delete,    Arcade::Keys::DELETE},
+	{sf::Keyboard::BackSpace, Arcade::Keys::BACKSPACE},
+	{sf::Keyboard::Tab,       Arcade::Keys::TAB},
+	{sf::Keyboard::Escape,    Arcade::Keys::ESC},
+	{sf::Keyboard::M,         Arcade::Keys::MOUSELEFT},
+	{sf::Keyboard::M,         Arcade::Keys::MOUSERIGHT}
 };
 
 Arcade::LibSFML::LibSFML(Arcade::Vect<size_t> screenSize,
-	const std::string &title) : screenSize(screenSize),
-				    sprite(this->texture)
+	const std::string &title)
+	: events(), screenSize(screenSize),
+	  window({static_cast<unsigned int>(screenSize.getX()),
+		  static_cast<unsigned int>(screenSize.getY()), 32}, title),
+	  texture(), sprite(this->texture)
 {
-	this->texture.create(800, 800);
+	this->texture.create(static_cast<unsigned int>(screenSize.getX()),
+			     static_cast<unsigned int>(screenSize.getY()));
 	this->sprite.setTexture(this->texture);
 	this->sprite.setPosition({0, 0});
-	this->screenSize.setX(800);
-	this->screenSize.setY(800);
-	this->window.create({800, 800, 32}, title);
+
+	this->text.setOrigin(0, 0);
+	font.loadFromFile("libs/src/SFML/arial_narrow_7.ttf");
+	this->text.setFont(font);
 }
 
 Arcade::LibSFML::~LibSFML()
@@ -148,33 +153,33 @@ void Arcade::LibSFML::clearEvents()
 
 void Arcade::LibSFML::drawPixelBox(Arcade::PixelBox &b)
 {
+	sf::Sprite spr;
+
 	if (this->isOpen()) {
 		auto array = &b.getPixelArray()[0];
 		this->texture.update((unsigned char *) array,
 				     static_cast<unsigned int>(b.getWidth()),
 				     static_cast<unsigned int>(b.getHeight()),
-				     static_cast<unsigned int>(0),
-				     static_cast<unsigned int>(0));
-		this->sprite.setPosition(b.getX(), b.getY());
-		this->sprite.setTextureRect({static_cast<int>(0),
-					     static_cast<int>(0),
-					     static_cast<int>(800),
-					     static_cast<int>(800)});
-		this->window.draw(this->sprite);
+				     0, 0);
+		spr.setTexture(this->texture);
+		spr.setPosition(b.getX(), b.getY());
+		spr.setTextureRect({0, 0, static_cast<int>(b.getWidth()),
+				    static_cast<int>(b.getHeight())});
+		this->window.draw(spr);
 	}
 }
 
 void Arcade::LibSFML::drawText(Arcade::TextBox &t)
 {
-	sf::Font font;
-	sf::Text text;
+	auto col = t.getColor();
 
-	if (!font.loadFromFile("./libs/src/SFML/OpenSans-Bold.ttf")) {
-		text.setFont(font);
-		text.setString(t.getValue());
+	if (this->isOpen()) {
 		text.setCharacterSize(
 			static_cast<unsigned int>(t.getFontSize()));
-		text.setColor(this->transformColor(t.getColor()));
+		text.setString(t.getValue());
+		text.setPosition(t.getX(), t.getY());
+		text.setColor({col.getRed(), col.getGreen(), col.getBlue(),
+			       col.getAlpha()});
 		this->window.draw(text);
 	}
 }

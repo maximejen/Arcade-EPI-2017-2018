@@ -13,15 +13,17 @@
 #include "Core.hpp"
 #include "LogicException.hpp"
 
-static const std::regex REGEX("^[a-z0-9_]*.so");
+static const std::regex REGEX("^[a-zA-Z0-9_]*.so");
 
-Arcade::Core::Core(const std::string &libPath) : selectedGame(0), selectedLib(0)
+Arcade::Core::Core(const std::string &libPath) : selectedGame(0),
+						 selectedLib(0)
 {
 	this->libraryPathes.push_back(libPath);
 	this->parseLibDir();
 	this->parseGameDir();
 	this->selectedLib = 0;
 	this->selectedGame = 0;
+	this->playerName = new PlayerName;
 }
 
 Arcade::Core::~Core()
@@ -44,9 +46,9 @@ void Arcade::Core::parseLibDir()
 		std::string name = namelist[i]->d_name;
 		if (std::regex_match(name.c_str(), cm, REGEX) &&
 		    std::find(this->libraryPathes.begin(),
-			      this->libraryPathes.end(), name) ==
+			      this->libraryPathes.end(), "./libs/" + name) ==
 		    this->libraryPathes.end()) {
-			this->libraryPathes.push_back(name);
+			this->libraryPathes.push_back("./libs/" + name);
 		}
 		free(namelist[i]);
 	}
@@ -66,7 +68,6 @@ void Arcade::Core::parseGameDir()
 		std::string name = namelist[i]->d_name;
 		if (std::regex_match(name.c_str(), cm, REGEX)) {
 			this->gamePathes.push_back("games/" + name);
-			//TODO: Je je comprend pas pk il ne prend pas game de base
 		}
 		free(namelist[i]);
 	}
@@ -74,45 +75,36 @@ void Arcade::Core::parseGameDir()
 
 int Arcade::Core::startArcade()
 {
-//	if (this->libraryPathes.empty() || this->gamePathes.empty())
-//		throw Arcade::LogicException("Error while parsing libs.");
+	Keys key = Keys::NONE;
+	if (this->libraryPathes.empty() || this->gamePathes.empty())
+		throw Arcade::LogicException("Error while parsing libs.");
 	this->graphLoader.loadLib(this->libraryPathes[this->selectedLib]);
 	this->gameLoader.loadLib(this->gamePathes[this->selectedGame]);
 	auto graphLib = this->graphLoader.getLibInstance();
 	auto gameLib = this->gameLoader.getLibInstance();
+	this->playerName->setPlayerName(*graphLib);
 //	if (!gameLib)
 //		std::cout << "No games loaded" << std::endl;
 	while (1) {
-
-		if (this->arcadeLoop(graphLib, gameLib) == 0)
+		if (this->arcadeLoop(graphLib, gameLib, key) == 0)
 			return 0;
-
-//		this->arcadeLoop(graphLib, gameLib);
 	}
 	return 1;
 }
 
-int Arcade::Core::arcadeLoop(IGraphicLib *graphLib, IGameLib *gameLib)
+int Arcade::Core::arcadeLoop(IGraphicLib *graphLib, IGameLib *gameLib, Keys key)
 {
 	while (graphLib->pollEvents()) {
-		auto key = graphLib->getLastEvent();
-		std::cout << "event : " << key << std::endl;
+		key = graphLib->getLastEvent();
 		if (key == Arcade::Keys::ESC) {
 			this->graphLoader.unloadLib();
 			return 0;
 		}
+		this->checkEvents(key, graphLib, gameLib);
 		gameLib->applyEvent(key);
 	}
 	gameLib->update();
-	//std::cout << "Name : " << gameLib->getName();
 	gameLib->refresh(*graphLib);
-	/*graphLib->clearWindow();
-	Arcade::PixelBox pixelBox({20, 10}, {3, 3}, {255, 255, 255, 255});
-	pixelBox.putPixel(1, {255, 30, 30, 255});
-	graphLib->drawPixelBox(pixelBox);
-	Arcade::TextBox textBox("test", {1, 1});
-	graphLib->drawText(textBox);
-	graphLib->refreshWindow();*/
 	return 1;
 }
 
@@ -134,4 +126,25 @@ const Arcade::GraphLibLoader &Arcade::Core::getGraphLoader() const
 void Arcade::Core::setGraphLoader(const Arcade::GraphLibLoader &graphLoader)
 {
 	Core::graphLoader = graphLoader;
+}
+
+void Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
+	IGameLib *&gameLib)
+{
+	if (key == Arcade::Keys::I) {
+		size_t size = this->libraryPathes.size();
+		this->graphLoader.unloadLib();
+		this->selectedLib++;
+		this->graphLoader.loadLib(
+			this->libraryPathes[this->selectedLib % size]);
+		graphicLib = this->graphLoader.getLibInstance();
+	}
+	if (key == Arcade::Keys::O) {
+		size_t size = this->gamePathes.size();
+		this->gameLoader.unloadLib();
+		this->selectedGame++;
+		this->gameLoader.loadLib(
+			this->gamePathes[this->selectedGame % size]);
+		gameLib = this->gameLoader.getLibInstance();
+	}
 }

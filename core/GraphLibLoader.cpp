@@ -35,7 +35,7 @@ bool Arcade::GraphLibLoader::loadLib(const std::string &libPath)
 	Arcade::IGraphicLib *(*ret)() = nullptr;
 	bool returnValue = false;
 
-	if (!this->isElfFile(libPath))
+	if (!this->isElfFile(libPath) || this->handleAddr != nullptr)
 		return returnValue;
 	if ((this->handleAddr = dlopen(libPath.c_str(), RTLD_LAZY))) {
 		returnValue = true;

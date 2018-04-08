@@ -25,7 +25,7 @@ set(sources
         libs/src/SDL/LibSDL.hpp
         libs/src/SDL/entryPoint.cpp
         games/src/Snake/entryPoint.cpp
-        games/src/Snake/LibSnake.cpp)
+        games/src/Snake/LibSnake.cpp core/PlayerName.cpp core/PlayerName.hpp)
 
 set(lib_ncurse_sources libs/src/ncurses/entryPoint.cpp libs/src/ncurses/LibNcurses.cpp libs/src/ncurses/LibNcurses.hpp)
 

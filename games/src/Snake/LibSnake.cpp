@@ -16,12 +16,13 @@ Arcade::LibSnake::LibSnake()
 	this->init();
 	this->curKey = Keys::NONE;
 	this->lastKey = Keys::Z;
-	this->score =0;
+	this->score = 0;
+	this->msgScore = new TextBox("Score: " + std::to_string(this->score), {0, 0}, 25, {120, 120,120, 120}, {255, 255, 255, 255});
 }
 
 Arcade::LibSnake::~LibSnake()
 {
-
+	delete this->msgScore;
 }
 
 const std::string Arcade::LibSnake::getName() const
@@ -36,14 +37,19 @@ bool Arcade::LibSnake::init()
 	this->mapSize.setX(MAP_WIDTH);
 	this->mapSize.setY(MAP_HEIGHT);
 
-	pos.first = rand() % MAP_WIDTH;
-	pos.second = rand() % MAP_HEIGHT;
-	pos.first = 10;
-	pos.second = 10;
+	pos.first = rand() % MAP_WIDTH / 2 + 3;
+	pos.second = rand() % MAP_HEIGHT / 2 + 3;
 	this->playerPos.push_back(pos);
+	pos.first = this->playerPos[0].first + 1;
+	pos.second = this->playerPos[0].second;
+	this->playerPos.push_back(pos);
+	pos.first = this->playerPos[0].first + 2;
+	pos.second = this->playerPos[0].second;
+	this->playerPos.push_back(pos);
+
 	this->setObjectPos();
-	//this->resize.setX(0);
 	time(&this->timer);
+
 	return true;
 }
 
@@ -60,7 +66,8 @@ bool Arcade::LibSnake::stop()
 
 void Arcade::LibSnake::applyEvent(Keys key)
 {
-	this->curKey = key;
+	//if (key == Keys::Z || key == Keys::Q || key == Keys::S || key == Keys::D)
+		this->curKey = key;
 }
 
 void Arcade::LibSnake::update()
@@ -70,50 +77,46 @@ void Arcade::LibSnake::update()
 	time(&curTime);
 	if (curTime == this->timer)
 		return;
-	if (curKey == Keys::NONE || !this->canGoBack(this->curKey)) {
+	if (curKey == Keys::NONE) {
 		this->movePlayer(this->lastKey);
 	} else {
+		if (!this->canGoBack(this->curKey)) {
+			this->curKey = this->lastKey;
+		}
 		this->movePlayer(this->curKey);
-		std::cout << "moved" << std::endl;
 		this->lastKey = this->curKey;
 		this->curKey = Keys::NONE;
-	}
-	if (this->playerPos[0].first == (int)this->objectPos.getY() &&
-		this->playerPos[0].second == (int)this->objectPos.getX()) {
-		std::cout << "Found" << std::endl;
-		this->score++;
 	}
 	time(&this->timer);
 }
 
 void Arcade::LibSnake::refresh(IGraphicLib &graphicLib)
 {
-	Vect<size_t> size = graphicLib.getScreenSize();
 	if (this->resize.getX() == 0) {
+		Vect<size_t> size = graphicLib.getScreenSize();
 		this->resize.setX(size.getX() / MAP_WIDTH);
 		this->resize.setY(size.getY() / MAP_HEIGHT);
 	}
 	graphicLib.clearWindow();
-
 	this->display(graphicLib);
-
+	graphicLib.drawText(*this->msgScore);
 	graphicLib.refreshWindow();
 }
 
 void Arcade::LibSnake::display(IGraphicLib &graphicLib)
 {
-	this->drawPlayer(this->objectPos.getY(), this->objectPos.getX(), graphicLib, 200);
+	this->drawPlayer(this->objectPos.getY(), this->objectPos.getX(), graphicLib, {244, 65, 65, 255});
 	for (int i = 0; i < (int)this->playerPos.size(); i++) {
-		this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, 255);
+		this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {244, 255, 255, 255});
 	}
 }
 
 void Arcade::LibSnake::drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,
-				  unsigned char color)
+				  Color color)
 {
 	y = y * this->resize.getY();
 	x = x * this->resize.getX();
-	Arcade::PixelBox pixelBox({this->resize.getX(), this->resize.getY()}, {y , x}, {color, color, color, 255});
+	Arcade::PixelBox pixelBox({this->resize.getX() - 1, this->resize.getY() - 1}, {y , x}, color);
 	graphicLib.drawPixelBox(pixelBox);
 }
 
@@ -155,30 +158,50 @@ int Arcade::LibSnake::checkFood(Keys dir)
 void Arcade::LibSnake::movePlayer(Keys dir)
 {
 	std::cout << "key : " << dir << std::endl;
-	int pos = this->checkFood(dir);
-	if (pos == 1)
+	if (this->checkFood(dir) == 1) {
 		this->setObjectPos();
-	this->moveSnake();
-	if (dir == Keys::Z) {
-		this->playerPos[0].first--;
-
-	} else if (dir == Keys::S) {
-		this->playerPos[0].first++;
-
-	} else if (dir == Keys::Q) {
-		this->playerPos[0].second--;
-
-	} else if (dir == Keys::D) {
-		this->playerPos[0].second++;
+		this->score++;
+		this->msgScore->setValue("Score: " + this->score);
 	}
+	this->moveSnake();
+	switch ((int)dir) {
+		case Keys::Z:
+			this->playerPos[0].first--;
+			break;
+		case Keys::S :
+			this->playerPos[0].first++;
+			break;
+		case Keys::Q :
+			this->playerPos[0].second--;
+			break;
+		case Keys::D :
+			this->playerPos[0].second++;
+			break;
+		default:
+			break;
+	}
+	if (this->checkEnd())
+		exit(0);
+}
 
-	/*for (int i = 1; i < (int)this->playerPos.size(); i++) {
+bool Arcade::LibSnake::checkEnd()
+{
+	bool ret = false;
+
+	for (int i = 1; i < (int)this->playerPos.size(); i++) {
 		if (this->playerPos[0] == this->playerPos[i]) {
-			std::cout << "Exiting" << std::endl;
-			exit(0);
+			ret = true;
 		}
-	}*/
-
+	}
+	if (this->playerPos[0].first < 0)
+		ret = true;
+	else if (this->playerPos[0].first >= MAP_HEIGHT)
+		ret = true;
+	else if (this->playerPos[0].second < 0)
+		ret = true;
+	else if (this->playerPos[0].second >= MAP_WIDTH)
+		ret = true;
+	return ret;
 }
 
 bool Arcade::LibSnake::canGoBack(Keys key)
@@ -187,25 +210,24 @@ bool Arcade::LibSnake::canGoBack(Keys key)
 
 	if (this->playerPos.size() == 1)
 		ret =  true;
-	else if (key == Keys::Z) {
-		ret = false;
-	} else if (key == Keys::S) {
-		ret = false;
+	else if (key == Keys::Z && this->playerPos[1].first + 1 != this->playerPos[0].first) {
+		ret = true;
+	} else if (key == Keys::S && this->playerPos[1].first - 1 != this->playerPos[0].first) {
+		ret = true;
 
-	} else if (key == Keys::Q) {
-		ret = false;
+	} else if (key == Keys::Q && this->playerPos[1].second + 1 != this->playerPos[0].second) {
+		ret = true;
 
-	} else if (key == Keys::D) {
+	} else if (key == Keys::D && this->playerPos[1].second + 1 != this->playerPos[0].second) {
+		ret = true;
+	} else
 		ret = false;
-	}
 	return ret;
 }
 
 void Arcade::LibSnake::moveSnake()
 {
 	auto tmp = this->playerPos;
-	if (this->playerPos.size() == 1)
-		return;
 	for (int i = 1; i < (int)this->playerPos.size(); i++) {
 		this->playerPos[i].first = tmp[i -1].first;
 		this->playerPos[i].second = tmp[i -1].second;
@@ -214,5 +236,5 @@ void Arcade::LibSnake::moveSnake()
 
 size_t Arcade::LibSnake::getScore()
 {
-	return 0;
+	return this->score;
 }

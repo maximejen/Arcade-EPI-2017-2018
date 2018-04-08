@@ -51,15 +51,18 @@ namespace Arcade {
 		Vect<size_t> mapSize;
 		void setObjectPos();
 		void display(IGraphicLib &graphicLib);
-		void drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,  unsigned char color);
+		void drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,  Color color);
 		void movePlayer(Keys dir);
 		int checkFood(Keys dir);
 		void moveSnake();
 		bool canGoBack(Keys key);
+		bool checkEnd();
+		TextBox *msgScore;
 		Vect<size_t>resize;
 		Keys curKey;
 		Keys lastKey;
 		time_t timer;
+		bool canRefresh;
 	};
 };
 

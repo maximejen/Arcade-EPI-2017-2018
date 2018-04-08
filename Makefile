@@ -13,7 +13,8 @@ SRC		=	main.cpp					\
 			core/LogicException.cpp				\
 			core/PixelBox.cpp				\
 			core/TextBox.cpp				\
-			core/Color.cpp
+			core/Color.cpp					\
+			core/PlayerName.cpp
 
 CXXFLAGS	=	-I./ -I./core -I./libs -I./games -W -Wall -Wextra -g -std=c++11
 

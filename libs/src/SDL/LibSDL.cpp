@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <iostream>
 #include <ios>
+#include <unistd.h>
 #include "LibSDL.hpp"
 
 static const std::unordered_map<int, Arcade::Keys> SDL_KEYS_List = {
@@ -55,6 +56,7 @@ static const std::unordered_map<int, Arcade::Keys> SDL_KEYS_List = {
 Arcade::LibSDL::LibSDL(Vect<size_t> screenSize, const std::string &name)
 {
 	SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
 
 	this->screenSize = screenSize;
 	this->window = NULL;
@@ -138,8 +140,7 @@ void Arcade::LibSDL::drawText(TextBox &text)
 	int texW = (int)text.getX();
 	int texH = (int)text.getY();
 
-	TTF_Init();
-	TTF_Font * font = TTF_OpenFont("/home/dams/repo/PSU/PSU_lemipc_2017/displaying/OpenSans-Bold.ttf", 25);
+	TTF_Font * font = TTF_OpenFont("./libs/src/SDL/OpenSans-Bold.ttf", text.getFontSize());
 	SDL_Color color = { text.getColor().getRed(), text.getColor().getGreen(),
 			    text.getColor().getBlue(), text.getColor().getAlpha()};
 	SDL_Surface * surface = TTF_RenderText_Solid(font,
@@ -156,13 +157,10 @@ void Arcade::LibSDL::drawText(TextBox &text)
 	TTF_CloseFont(font);
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
-	TTF_Quit();
 }
 
 void Arcade::LibSDL::drawPixel(int x, int y, const Color &color)
 {
-	SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
-	SDL_RenderClear(this->renderer);
 	SDL_SetRenderDrawColor(this->renderer, color.getRed(), color.getGreen(),
 			       color.getBlue(), color.getAlpha());
 	SDL_RenderDrawPoint(this->renderer,y,x);
@@ -182,7 +180,6 @@ bool Arcade::LibSDL::pollEvents()
 
 	if (event.type != 0 && event.key.keysym.sym != 0) {
 		if (SDL_KEYS_List.find(event.key.keysym.sym) != SDL_KEYS_List.end()) {
-			std::cout << "Enter :" << event.key.keysym.sym << std::endl;
 			this->events.push(SDL_KEYS_List.at(event.key.keysym.sym));
 		}
 	}
@@ -191,6 +188,7 @@ bool Arcade::LibSDL::pollEvents()
 
 Arcade::Keys Arcade::LibSDL::getLastEvent()
 {
+	usleep(1);
 	Arcade::Keys ret = this->events.back();
 	this->events.pop();
 	return ret;
