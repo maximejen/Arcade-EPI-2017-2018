@@ -72,11 +72,20 @@ bool Arcade::Color::operator!=(const Color &ocolor)
 {
 	bool ret = false;
 
-	if (this->getRed() != ocolor.getRed())
+	if (this->getRed() != ocolor.getRed() ||
+	    this->getGreen() != ocolor.getGreen() ||
+	    this->getBlue() != ocolor.getBlue())
 		ret = true;
-	else if (this->getGreen() != ocolor.getGreen())
-		ret = true;
-	else if (this->getBlue() != ocolor.getBlue())
+	return ret;
+}
+
+bool Arcade::Color::operator==(const Arcade::Color &ocolor)
+{
+	bool ret = false;
+
+	if (this->getRed() == ocolor.getRed() &&
+	    this->getGreen() == ocolor.getGreen() &&
+	    this->getBlue() == ocolor.getBlue())
 		ret = true;
 	return ret;
 }

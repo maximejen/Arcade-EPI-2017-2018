@@ -27,6 +27,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	make -C ./libs
+	make -C ./games
 	g++ -o $(NAME) $(OBJ) $(LIBFLAGS)
 
 core: $(OBJ)
@@ -36,14 +37,16 @@ graphicals:
 	make -C ./libs
 
 games:
-	echo "try to compile the games"
+	make -C ./games
 
 clean:
 	make clean -C ./libs
+	make clean -C ./games
 	rm -rf $(OBJ)
 
 fclean: clean
 	make fclean -C ./libs
+	make fclean -C ./games
 	rm -rf $(NAME)
 
 re: fclean all

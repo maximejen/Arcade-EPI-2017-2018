@@ -6,7 +6,7 @@
 */
 
 #ifndef CPP_ARCADE_DLLOADER_HPP
-	#define CPP_ARCADE_DLLOADER_HPP
+#define CPP_ARCADE_DLLOADER_HPP
 
 #include <string>
 #include "../libs/src/IGraphicLib.hpp"

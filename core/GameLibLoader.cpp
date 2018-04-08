@@ -35,7 +35,7 @@ bool Arcade::GameLibLoader::loadLib(const std::string &libPath)
 	Arcade::IGameLib *(*ret)() = nullptr;
 	bool returnValue = false;
 
-	if (!this->isElfFile(libPath))
+ 	if (!this->isElfFile(libPath))
 		return false;
 	if ((this->handleAddr = dlopen(libPath.c_str(), RTLD_LAZY))) {
 		returnValue = true;

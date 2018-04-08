@@ -10,6 +10,7 @@
 #include <sys/ioctl.h>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 #include "LibNcurses.hpp"
 
 static const std::unordered_map<int, Arcade::Keys> NCURSES_KEYS = {
@@ -52,6 +53,64 @@ static const std::unordered_map<int, Arcade::Keys> NCURSES_KEYS = {
 	{36,            Arcade::ESC},
 	{KEY_MOUSE,     Arcade::MOUSELEFT},
 	{KEY_MOUSE,     Arcade::MOUSERIGHT}
+};
+
+static const std::vector<std::function<short(
+	const Arcade::Color &)>>
+	NCURSES_COLOR = {
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getRed()) > 80 &&
+		    PERCENT(color.getGreen()) > 80 &&
+		    PERCENT(color.getBlue()) > 80)
+			return COLOR_WHITE;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getGreen()) < 80 &&
+		    PERCENT(color.getRed()) < 80 &&
+		    PERCENT(color.getBlue()) < 80)
+			return COLOR_BLACK;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getGreen()) < 80 &&
+		    PERCENT(color.getRed()) > 80 &&
+		    PERCENT(color.getBlue()) < 80)
+			return COLOR_RED;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getGreen()) > 80 &&
+		    PERCENT(color.getRed()) < 80 &&
+		    PERCENT(color.getBlue()) < 80)
+			return COLOR_GREEN;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getRed()) > 80 &&
+		    PERCENT(color.getGreen()) > 80)
+			return COLOR_YELLOW;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getGreen()) < 80 &&
+		    PERCENT(color.getRed()) < 80 &&
+		    PERCENT(color.getBlue()) > 80)
+			return COLOR_BLUE;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getRed()) > 80 &&
+		    PERCENT(color.getBlue()) > 80)
+			return COLOR_MAGENTA;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getGreen()) > 80 &&
+		    PERCENT(color.getBlue()) > 80)
+			return COLOR_CYAN;
+		return -1;
+	}}
 };
 
 // the screen size given by the user is useless, the screen size is defined
@@ -157,48 +216,75 @@ void Arcade::LibNcurses::drawPixelBox(Arcade::PixelBox &box)
 
 void Arcade::LibNcurses::drawText(Arcade::TextBox &text)
 {
-	this->init_ncurse_color(text.getColor(), text.getBackgroundColor());
+	short pair = 0;
+
+	this->init_ncurse_color(text.getColor(), text.getBackgroundColor(),
+				pair);
 	mvprintw(static_cast<int>(text.getY()), static_cast<int>(text.getX()),
 		 "%s", text.getValue().c_str());
-	this->resetColor();
+	this->resetColor(pair);
 }
 
 void Arcade::LibNcurses::drawPixel(int x, int y, char c,
 	const Arcade::Color &color)
 {
-	this->init_ncurse_color(color, color);
+	short pair = 0;
+
+	this->init_ncurse_color(color, color, pair);
 	mvprintw(y, x, "%c", c);
-	this->resetColor();
+	this->resetColor(pair);
 }
 
 void Arcade::LibNcurses::init_ncurse_color(const Arcade::Color &c,
-	const Arcade::Color &bc)
+	const Arcade::Color &bc, short &pair)
 {
-	std::pair<Arcade::Color, Arcade::Color> pair(c, bc);
-	size_t i;
+	short i;
 
-	for (i = 0 ; i < this->colors.size() &&
-		pair.first != this->colors[i].first &&
-		pair.second != this->colors[i].second; i++);
-	if (i == this->colors.size()) {
+	i = this->findInColors(c, bc);
+	if (i < 0) {
 		this->colors.emplace_back(c, bc);
+		pair = static_cast<short>(this->colors.size());
 	}
-	init_color(COLOR_RED, static_cast<short>(T_VALUE(c.getRed())),
-		   static_cast<short>(T_VALUE(c.getGreen())),
-		   static_cast<short>(T_VALUE(c.getBlue())));
-	init_color(COLOR_BLUE, static_cast<short>(T_VALUE(bc.getRed())),
-		   static_cast<short>(T_VALUE(bc.getGreen())),
-		   static_cast<short>(T_VALUE(bc.getBlue())));
-	init_pair(static_cast<short>(i), COLOR_RED, COLOR_BLUE);
-	attron(COLOR_PAIR(1));
+	else
+		pair = static_cast<short>(i + 1);
+	init_pair(pair, this->translateColor(c), this->translateColor(bc));
+	attron(COLOR_PAIR(pair));
 }
 
-void Arcade::LibNcurses::resetColor()
+void Arcade::LibNcurses::resetColor(short pair)
 {
-	attroff(COLOR_PAIR(1));
+	attroff(COLOR_PAIR(pair));
 }
 
 std::string Arcade::LibNcurses::getName() const
 {
 	return "Ncurses";
+}
+
+short Arcade::LibNcurses::translateColor(const Arcade::Color &color)
+{
+	short col;
+
+	for (const auto &i : NCURSES_COLOR) {
+		col = i(color);
+		if (col != -1)
+			return col;
+	}
+	return 0;
+}
+
+short
+Arcade::LibNcurses::findInColors(const Arcade::Color &c,
+	const Arcade::Color &bc)
+{
+	size_t i = 0;
+	bool ctn = true;
+
+	for (i = 0 ; i < this->colors.size() && ctn ; i++) {
+		if (this->colors[i].first == c && this->colors[i].second == bc)
+			ctn = false;
+	}
+	if (ctn)
+		return -1;
+	return static_cast<short>(i);
 }

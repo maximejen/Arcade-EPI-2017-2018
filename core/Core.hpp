@@ -41,7 +41,7 @@ namespace Arcade {
 		void setGraphLoader(const GraphLibLoader &graphLoader);
 
 	private:
-		int arcadeLoop(IGraphicLib *);
+		int arcadeLoop(IGraphicLib *, IGameLib *	);
 
 		std::vector<std::string> libraryPathes;
 		std::vector<std::string> gamePathes;

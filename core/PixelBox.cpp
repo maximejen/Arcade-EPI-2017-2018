@@ -79,12 +79,12 @@ void Arcade::PixelBox::setPos(Vect<size_t> pos)
 
 void Arcade::PixelBox::putPixel(Vect<size_t> pos, Color col)
 {
-	this->_colorFrame[pos.getX() * pos.getY()] = col;
+	this->_colorFrame[pos.getX() + pos.getY() * this->getWidth()] = col;
 }
 
 Arcade::Color Arcade::PixelBox::getPixel(Vect<size_t> pos) const
 {
-	return this->_colorFrame[pos.getX() * pos.getY()];
+	return this->_colorFrame[pos.getX() + pos.getY() * this->getWidth()];
 }
 
 std::vector<Arcade::Color>& Arcade::PixelBox::getPixelArray()

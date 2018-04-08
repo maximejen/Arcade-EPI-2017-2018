@@ -16,7 +16,7 @@
 	#include "../IGraphicLib.hpp"
 
 namespace Arcade {
-	#define T_VALUE(x) (x * 3.9)
+	#define PERCENT(x) (x * 0.39)
 
 	class LibNcurses : public IGraphicLib {
 	public:
@@ -33,8 +33,8 @@ namespace Arcade {
 
 		void drawPixelBox(PixelBox &) override;
 		void drawPixel(int x, int y, char c, const Color &color);
-		void init_ncurse_color(const Color &, const Color &);
-		void resetColor();
+		void init_ncurse_color(const Color &, const Color &, short &);
+		void resetColor(short);
 
 		void drawText(TextBox &) override;
 
@@ -52,6 +52,8 @@ namespace Arcade {
 		Vect<size_t> screenSize;
 		WINDOW *window;
 		std::vector<std::pair<Arcade::Color, Arcade::Color>> colors;
+		short translateColor(const Arcade::Color &color);
+		short findInColors(const Color &c, const Color &bc);
 	};
 }
 
