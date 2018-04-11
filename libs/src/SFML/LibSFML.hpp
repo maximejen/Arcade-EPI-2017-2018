@@ -40,16 +40,14 @@ namespace Arcade {
 		size_t getMaxX() const override;
 		size_t getMaxY() const override;
 
-		sf::Color transformColor(const Color &color);
-
 	private:
 		std::queue<Arcade::Keys> events;
 		Vect<size_t> screenSize;
 		sf::RenderWindow window;
 		sf::Texture texture;
 		sf::Sprite sprite;
-		sf::Text text;
 		sf::Font font;
+		sf::Text text;
 	};
 };
 

@@ -21,8 +21,6 @@ Arcade::Core::Core(const std::string &libPath) : selectedGame(0),
 	this->libraryPathes.push_back(libPath);
 	this->parseLibDir();
 	this->parseGameDir();
-	this->selectedLib = 0;
-	this->selectedGame = 0;
 	this->playerName = new PlayerName;
 }
 
@@ -75,20 +73,25 @@ void Arcade::Core::parseGameDir()
 
 int Arcade::Core::startArcade()
 {
+	bool ctn = true;
+
 	Keys key = Keys::NONE;
 	if (this->libraryPathes.empty() || this->gamePathes.empty())
 		throw Arcade::LogicException("Error while parsing libs.");
-	this->graphLoader.loadLib(this->libraryPathes[this->selectedLib]);
-	this->gameLoader.loadLib(this->gamePathes[this->selectedGame]);
+	if (!this->graphLoader.loadLib(this->libraryPathes[this->selectedLib]))
+		return 0;
+	if (!this->gameLoader.loadLib(this->gamePathes[this->selectedGame]))
+		return 0;
 	auto graphLib = this->graphLoader.getLibInstance();
 	auto gameLib = this->gameLoader.getLibInstance();
-	this->playerName->setPlayerName(*graphLib);
-//	if (!gameLib)
-//		std::cout << "No games loaded" << std::endl;
-	while (1) {
+	//if (!this->playerName->setPlayerName(*graphLib))
+	//	return 1;
+	while (ctn) {
 		if (this->arcadeLoop(graphLib, gameLib, key) == 0)
-			return 0;
+			ctn = false;
 	}
+	this->gameLoader.unloadLib();
+	this->graphLoader.unloadLib();
 	return 1;
 }
 
@@ -96,13 +99,16 @@ int Arcade::Core::arcadeLoop(IGraphicLib *graphLib, IGameLib *gameLib, Keys key)
 {
 	while (graphLib->pollEvents()) {
 		key = graphLib->getLastEvent();
-		if (key == Arcade::Keys::ESC) {
-			this->graphLoader.unloadLib();
+		if (key == Arcade::Keys::ESC)
 			return 0;
+		if (!this->checkEvents(key, graphLib, gameLib)) {
+//			std::cout << "Swtiching to other lib" << std::endl;
+			break;
 		}
-		this->checkEvents(key, graphLib, gameLib);
 		gameLib->applyEvent(key);
 	}
+//	std::cout << "Switch toooooooo : " << graphLib->getName() << std::endl;
+
 	gameLib->update();
 	gameLib->refresh(*graphLib);
 	return 1;
@@ -128,7 +134,7 @@ void Arcade::Core::setGraphLoader(const Arcade::GraphLibLoader &graphLoader)
 	Core::graphLoader = graphLoader;
 }
 
-void Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
+bool Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
 	IGameLib *&gameLib)
 {
 	if (key == Arcade::Keys::I) {
@@ -138,6 +144,8 @@ void Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
 		this->graphLoader.loadLib(
 			this->libraryPathes[this->selectedLib % size]);
 		graphicLib = this->graphLoader.getLibInstance();
+		std::cout << "Switch to : " << graphicLib->getName() << std::endl;
+		return false;
 	}
 	if (key == Arcade::Keys::O) {
 		size_t size = this->gamePathes.size();
@@ -146,5 +154,8 @@ void Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
 		this->gameLoader.loadLib(
 			this->gamePathes[this->selectedGame % size]);
 		gameLib = this->gameLoader.getLibInstance();
+		gameLib->init();
+		return false;
 	}
+	return true;
 }

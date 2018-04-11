@@ -16,7 +16,7 @@ SRC		=	main.cpp					\
 			core/Color.cpp					\
 			core/PlayerName.cpp
 
-CXXFLAGS	=	-I./ -I./core -I./libs -I./games -W -Wall -Wextra -g -std=c++11
+CXXFLAGS	=	-I./ -I./core -I./libs -I./games -W -Wall -Wextra -g -std=c++11 -rdynamic
 
 LIBFLAGS	=	-ldl
 

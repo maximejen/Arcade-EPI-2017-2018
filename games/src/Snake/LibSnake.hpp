@@ -11,9 +11,12 @@
 #include <algorithm>
 #include <vector>
 #include "time.h"
-
-#define MAP_WIDTH 20
-#define MAP_HEIGHT 20
+#include <thread>
+#include <pthread.h>
+#include <chrono>
+#include <ctime>
+#define MAP_WIDTH 29
+#define MAP_HEIGHT 29
 
 namespace Arcade {
 	class LibSnake : public IGameLib {
@@ -44,6 +47,9 @@ namespace Arcade {
 		// To call at the end of the execution of the game (after the player loose or win) for getting his score
 		size_t getScore();
 
+		static void displayMap(IGraphicLib *graphicLib);
+
+
 	private:
 		size_t score;
 		std::vector<std::pair<int, int>> playerPos;
@@ -51,18 +57,21 @@ namespace Arcade {
 		Vect<size_t> mapSize;
 		void setObjectPos();
 		void display(IGraphicLib &graphicLib);
-		void drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,  Color color);
+		void drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,  Color color, bool space);
 		void movePlayer(Keys dir);
 		int checkFood(Keys dir);
 		void moveSnake();
 		bool canGoBack(Keys key);
 		bool checkEnd();
+		bool checkSpawnPos();
+		void displaymap(IGraphicLib &graphicLib);
 		TextBox *msgScore;
 		Vect<size_t>resize;
 		Keys curKey;
 		Keys lastKey;
-		time_t timer;
-		bool canRefresh;
+		std::chrono::steady_clock::time_point timer;
+		std::chrono::steady_clock::time_point timeDisplay;
+		double timeSleep;
 	};
 };
 

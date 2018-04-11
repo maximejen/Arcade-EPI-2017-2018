@@ -11,14 +11,14 @@ TARGET_LIB 	= 	lib_arcade_SDL.so
 
 SRCS		= 	./entryPoint.cpp			\
 			./LibSDL.cpp				\
-			./TextBox.cpp				\
-			./PixelBox.cpp				\
-			./Color.cpp
+			../../../core/TextBox.cpp		\
+			../../../core/PixelBox.cpp		\
+			../../../core/Color.cpp
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 
 CXXFLAGS 	= 	-I. -I ../../../core
-CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC
+CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC -rdynamic
 LDFLAGS      	=	-shared -g -lSDL2main -lSDL2 -lSDL2_ttf
 
 all: $(TARGET_LIB)

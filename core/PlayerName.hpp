@@ -12,18 +12,22 @@
 #include <string>
 #include "Keys.hpp"
 #include "../libs/src/IGraphicLib.hpp"
+#include <chrono>
 
 namespace Arcade {
 	class PlayerName {
 	public:
 		PlayerName();
-		void setPlayerName(IGraphicLib &);
+		bool setPlayerName(IGraphicLib &);
 		std::string getPlayerName() const;
 
 	private:
+		bool endescape(Keys curKey);
 		std::string playerName;
 		void addNewLetter(Keys);
 		bool endEntry(Keys curKey);
+		std::chrono::steady_clock::time_point timer;
+
 	};
 }
 

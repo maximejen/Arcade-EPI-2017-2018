@@ -11,14 +11,14 @@ TARGET_LIB 	= 	lib_arcade_ncurses.so
 
 SRCS		= 	./entryPoint.cpp			\
 			./LibNcurses.cpp			\
-			./TextBox.cpp				\
-			./PixelBox.cpp				\
-			./Color.cpp
+			../../../core/TextBox.cpp		\
+			../../../core/PixelBox.cpp		\
+			../../../core/Color.cpp
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 
 CXXFLAGS 	= 	-I. -I ../../../core
-CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC
+CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC -rdynamic
 LDFLAGS      	=	-shared -lncurses
 
 all: $(TARGET_LIB)

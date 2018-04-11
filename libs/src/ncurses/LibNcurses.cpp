@@ -50,7 +50,7 @@ static const std::unordered_map<int, Arcade::Keys> NCURSES_KEYS = {
 	{KEY_DL,        Arcade::DELETE},
 	{KEY_BACKSPACE, Arcade::BACKSPACE},
 	{KEY_BTAB,      Arcade::TAB},
-	{36,            Arcade::ESC},
+	{27,            Arcade::ESC},
 	{KEY_MOUSE,     Arcade::MOUSELEFT},
 	{KEY_MOUSE,     Arcade::MOUSERIGHT}
 };
@@ -129,11 +129,12 @@ Arcade::LibNcurses::~LibNcurses()
 
 bool Arcade::LibNcurses::pollEvents()
 {
-	timeout(10);
+	timeout(0);
 	int event = getch();
 
 	if (event != 0 && event != ERR) {
-		this->events.push(NCURSES_KEYS.at(event));
+		if (NCURSES_KEYS.find(event) != NCURSES_KEYS.end())
+			this->events.push(NCURSES_KEYS.at(event));
 	}
 	return !this->events.empty();
 }
@@ -168,7 +169,10 @@ size_t Arcade::LibNcurses::getMaxY() const
 
 void Arcade::LibNcurses::refreshWindow()
 {
+	this->screenSize.setX(static_cast<size_t>(COLS));
+	this->screenSize.setY(static_cast<size_t>(LINES));
 	refresh();
+	//TODO:Gérer le resize
 }
 
 void Arcade::LibNcurses::clearWindow()
@@ -192,37 +196,25 @@ void Arcade::LibNcurses::openRenderer(std::string const &title)
 	(void) title;
 	this->window = initscr();
 	curs_set(0);
-	keypad(this->window, true);
-	struct winsize size{};
-	ioctl(0, TIOCGWINSZ, &size);
-	this->screenSize.setX(size.ws_col);
-	this->screenSize.setY(size.ws_row);
 	start_color();
 	cbreak();
 	noecho();
+	keypad(this->window, true);
+	this->screenSize.setX(static_cast<size_t>(COLS));
+	this->screenSize.setY(static_cast<size_t>(LINES));
+
 }
 
 void Arcade::LibNcurses::drawPixelBox(Arcade::PixelBox &box)
 {
-	for (size_t y = 0 ; y < box.getHeight() ; y++) {
-		for (size_t x = 0 ; x < box.getWidth() ; x++) {
-			auto px = static_cast<int>(box.getX() + x);
-			auto py = static_cast<int>(box.getY() + y);
-			Color value = box.getPixel(px + py * box.getWidth());
+	for (int i = 0; i < (int)box.getHeight(); i++) {
+		for (int j = 0; j < (int)box.getWidth(); j++) {
+			auto px = static_cast<int>(box.getX() + i);
+			auto py = static_cast<int>(box.getY() + j);
+			Color value = box.getPixel(j + i * box.getWidth());
 			this->drawPixel(px, py, ' ', value);
 		}
 	}
-}
-
-void Arcade::LibNcurses::drawText(Arcade::TextBox &text)
-{
-	short pair = 0;
-
-	this->init_ncurse_color(text.getColor(), text.getBackgroundColor(),
-				pair);
-	mvprintw(static_cast<int>(text.getY()), static_cast<int>(text.getX()),
-		 "%s", text.getValue().c_str());
-	this->resetColor(pair);
 }
 
 void Arcade::LibNcurses::drawPixel(int x, int y, char c,
@@ -231,7 +223,7 @@ void Arcade::LibNcurses::drawPixel(int x, int y, char c,
 	short pair = 0;
 
 	this->init_ncurse_color(color, color, pair);
-	mvprintw(y, x, "%c", c);
+	mvprintw(x, y, "%c", c);
 	this->resetColor(pair);
 }
 
@@ -249,6 +241,17 @@ void Arcade::LibNcurses::init_ncurse_color(const Arcade::Color &c,
 		pair = static_cast<short>(i + 1);
 	init_pair(pair, this->translateColor(c), this->translateColor(bc));
 	attron(COLOR_PAIR(pair));
+}
+
+void Arcade::LibNcurses::drawText(Arcade::TextBox &text)
+{
+	short pair = 0;
+
+	this->init_ncurse_color(text.getColor(), text.getBackgroundColor(),
+				pair);
+	mvprintw(static_cast<int>(text.getY()), static_cast<int>(text.getX()),
+		 "%s", text.getValue().c_str());
+	this->resetColor(pair);
 }
 
 void Arcade::LibNcurses::resetColor(short pair)

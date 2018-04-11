@@ -55,7 +55,6 @@ bool Arcade::GraphLibLoader::isElfFile(const std::string &libPath) const
 	std::ifstream lib(libPath);
 	char magic[5] = {0, 0, 0, 0, 0};
 	std::string tmp;
-
 	if (lib.fail())
 		return false;
 	lib.read(magic, 4);

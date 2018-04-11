@@ -10,14 +10,52 @@
 #include <cstdlib>
 #include "LibSnake.hpp"
 
+static const std::vector<std::string> NIBBLER_MAP = {
+	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+	"XXXXXX        XXX       XXX  X",
+	"X                            X",
+	"X       X             X      X",
+	"X       X             X      X",
+	"X       X             X      X",
+	"X                            X",
+	"X                            X",
+	"X  X                      X  X",
+	"X   X                    X   X",
+	"X   X        XXXXX       X   X",
+	"X  X        XXXXXXX       X  X",
+	"X           XXXXXXX          X",
+	"X      X    XXXXXXX    X     X",
+	"X     X      XXXXX      X    X",
+	"X     X                 X    X",
+	"X      X               X     X",
+	"X                            X",
+	"X                            X",
+	"X       X             X      X",
+	"X       X             X      X",
+	"X       X             X      X",
+	"X                            X",
+	"X  XXX        XXX       XXX  X",
+	"X        X          X        X",
+	"X         X        X         X",
+	"X          X      X          X",
+	"X                            X",
+	"XX                          XX",
+	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+};
+
 Arcade::LibSnake::LibSnake()
 {
-	srand (time(NULL));
+	srand(time(NULL));
 	this->init();
 	this->curKey = Keys::NONE;
 	this->lastKey = Keys::Z;
 	this->score = 0;
 	this->msgScore = new TextBox("Score: " + std::to_string(this->score), {0, 0}, 25, {120, 120,120, 120}, {255, 255, 255, 255});
+	std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+	this->timeDisplay = t1;
+	this->timer = t1;
+	this->timeSleep = 0.6;
+
 }
 
 Arcade::LibSnake::~LibSnake()
@@ -37,8 +75,8 @@ bool Arcade::LibSnake::init()
 	this->mapSize.setX(MAP_WIDTH);
 	this->mapSize.setY(MAP_HEIGHT);
 
-	pos.first = rand() % MAP_WIDTH / 2 + 3;
-	pos.second = rand() % MAP_HEIGHT / 2 + 3;
+	pos.first = 19;
+	pos.second = 15;
 	this->playerPos.push_back(pos);
 	pos.first = this->playerPos[0].first + 1;
 	pos.second = this->playerPos[0].second;
@@ -46,10 +84,25 @@ bool Arcade::LibSnake::init()
 	pos.first = this->playerPos[0].first + 2;
 	pos.second = this->playerPos[0].second;
 	this->playerPos.push_back(pos);
+	pos.first = this->playerPos[0].first + 3;
+	pos.second = this->playerPos[0].second;
+	this->playerPos.push_back(pos);
+	this->objectPos.setY(5);
+	this->objectPos.setX(5);
 
-	this->setObjectPos();
-	time(&this->timer);
+	return true;
+}
 
+bool Arcade::LibSnake::checkSpawnPos()
+{
+	for (int i = 0; i < (int)this->playerPos.size(); i++) {
+		if (((int)this->objectPos.getY() == (int)this->playerPos[i].first &&
+			(int)this->objectPos.getX() == (int)this->playerPos[i].second) ||
+			(NIBBLER_MAP[this->objectPos.getY()][this->objectPos.getX()] == 'X')) {
+			std::cout << "Reload Object pos" << std::endl;
+			this->setObjectPos();
+		}
+	}
 	return true;
 }
 
@@ -57,6 +110,9 @@ void Arcade::LibSnake::setObjectPos()
 {
 	this->objectPos.setY(rand() % MAP_HEIGHT);
 	this->objectPos.setX(rand() % MAP_WIDTH);
+	std::cout << " Pos :" << this->objectPos.getY() << this->objectPos.getX() << std::endl;
+
+	this->checkSpawnPos();
 }
 
 bool Arcade::LibSnake::stop()
@@ -66,16 +122,14 @@ bool Arcade::LibSnake::stop()
 
 void Arcade::LibSnake::applyEvent(Keys key)
 {
-	//if (key == Keys::Z || key == Keys::Q || key == Keys::S || key == Keys::D)
-		this->curKey = key;
+	this->curKey = key;
 }
 
 void Arcade::LibSnake::update()
 {
-
-	time_t curTime;
-	time(&curTime);
-	if (curTime == this->timer)
+	std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timer);
+	if (time_span.count() <= this->timeSleep)
 		return;
 	if (curKey == Keys::NONE) {
 		this->movePlayer(this->lastKey);
@@ -87,7 +141,9 @@ void Arcade::LibSnake::update()
 		this->lastKey = this->curKey;
 		this->curKey = Keys::NONE;
 	}
-	time(&this->timer);
+	std::cout << "Taille: " << NIBBLER_MAP[0].size()<< std::endl;
+	std::cout << "Taille: " << NIBBLER_MAP.size()<< std::endl;
+	this->timer = t2;
 }
 
 void Arcade::LibSnake::refresh(IGraphicLib &graphicLib)
@@ -96,27 +152,48 @@ void Arcade::LibSnake::refresh(IGraphicLib &graphicLib)
 		Vect<size_t> size = graphicLib.getScreenSize();
 		this->resize.setX(size.getX() / MAP_WIDTH);
 		this->resize.setY(size.getY() / MAP_HEIGHT);
+		this->msgScore->setPos({size.getY() / 40, size.getX() / 70});
 	}
-	graphicLib.clearWindow();
-	this->display(graphicLib);
-	graphicLib.drawText(*this->msgScore);
-	graphicLib.refreshWindow();
+	std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timeDisplay);
+	if (time_span.count() >= 0.1) {
+		graphicLib.clearWindow();
+		this->display(graphicLib);
+		this->displaymap(graphicLib);
+		graphicLib.drawText(*this->msgScore);
+		graphicLib.refreshWindow();
+		this->timeDisplay = t2;
+	}
+}
+
+void Arcade::LibSnake::displaymap(IGraphicLib &graphicLib)
+{
+	for (int i = 0; i < (int)NIBBLER_MAP.size(); i++) {
+		for (int j = 0; j < (int)NIBBLER_MAP[i].size(); j++) {
+			if (NIBBLER_MAP[i][j] == 'X')
+				this->drawPlayer(i,j,  graphicLib, {255, 0, 178, 255}, false);
+		}
+	}
 }
 
 void Arcade::LibSnake::display(IGraphicLib &graphicLib)
 {
-	this->drawPlayer(this->objectPos.getY(), this->objectPos.getX(), graphicLib, {244, 65, 65, 255});
+	this->drawPlayer(this->objectPos.getY(), this->objectPos.getX(), graphicLib, {244, 65, 65, 255},
+			 true);
 	for (int i = 0; i < (int)this->playerPos.size(); i++) {
-		this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {244, 255, 255, 255});
+		this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {244, 255, 255, 255},
+				 true);
 	}
 }
 
 void Arcade::LibSnake::drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,
-				  Color color)
+				  Color color, bool space)
 {
 	y = y * this->resize.getY();
 	x = x * this->resize.getX();
-	Arcade::PixelBox pixelBox({this->resize.getX() - 1, this->resize.getY() - 1}, {y , x}, color);
+		Arcade::PixelBox pixelBox({this->resize.getX(), this->resize.getY()}, {y , x}, color);
+	if (space)
+		pixelBox.setSize({this->resize.getX() -1, this->resize.getY() -1});
 	graphicLib.drawPixelBox(pixelBox);
 }
 
@@ -125,28 +202,29 @@ int Arcade::LibSnake::checkFood(Keys dir)
 	if (dir == Keys::Z) {
 		if (this->playerPos[0].first -1 == (int)this->objectPos.getY() &&
 		    this->playerPos[0].second == (int)this->objectPos.getX()) {
-			this->playerPos.insert(this->playerPos.begin(), std::make_pair(this->playerPos[0].first - 1, this->playerPos[0].second));
+			//this->playerPos.insert(this->playerPos.begin(), std::make_pair(this->playerPos[0].first - 1, this->playerPos[0].second));
+			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
 			return (1);
 		}
 	}
 	else if (dir == Keys::S) {
 		if (this->playerPos[0].first + 1 == (int)this->objectPos.getY() &&
 		    this->playerPos[0].second == (int)this->objectPos.getX()) {
-			this->playerPos.insert(this->playerPos.begin(), std::make_pair(this->playerPos[0].first + 1, this->playerPos[0].second));
+			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
 			return (1);
 		}
 	}
 	else if (dir == Keys::Q) {
 		if (this->playerPos[0].first == (int)this->objectPos.getY() &&
 		    this->playerPos[0].second -1 == (int)this->objectPos.getX()) {
-			this->playerPos.insert(this->playerPos.begin(), std::make_pair(this->playerPos[0].first, this->playerPos[0].second - 1));
+			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
 			return (1);
 		}
 	}
 	else if (dir == Keys::D) {
 		if (this->playerPos[0].first == (int)this->objectPos.getY() &&
 		    this->playerPos[0].second + 1 == (int)this->objectPos.getX()) {
-			this->playerPos.insert(this->playerPos.begin(), std::make_pair(this->playerPos[0].first, this->playerPos[0].second +1));
+			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
 			return (1);
 		}
 	}
@@ -161,7 +239,9 @@ void Arcade::LibSnake::movePlayer(Keys dir)
 	if (this->checkFood(dir) == 1) {
 		this->setObjectPos();
 		this->score++;
-		this->msgScore->setValue("Score: " + this->score);
+		this->msgScore->setValue("Score: " + std::to_string(this->score));
+		if (this->timeSleep > 0.3)
+			this->timeSleep -= 0.05;
 	}
 	this->moveSnake();
 	switch ((int)dir) {
@@ -201,6 +281,8 @@ bool Arcade::LibSnake::checkEnd()
 		ret = true;
 	else if (this->playerPos[0].second >= MAP_WIDTH)
 		ret = true;
+	if (NIBBLER_MAP[this->playerPos[0].first][this->playerPos[0].second] == 'X')
+		return true;
 	return ret;
 }
 

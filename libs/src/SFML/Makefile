@@ -11,15 +11,15 @@ TARGET_LIB 	= 	lib_arcade_SFML.so
 
 SRCS		= 	./entryPoint.cpp			\
 			./LibSFML.cpp				\
-			./TextBox.cpp				\
-			./PixelBox.cpp				\
-			./Color.cpp
+			../../../core/TextBox.cpp		\
+			../../../core/PixelBox.cpp		\
+			../../../core/Color.cpp
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 
 CXXFLAGS 	= 	-I. -I ../../../core
 CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC
-LDFLAGS      	=	-shared -lsfml-graphics -lsfml-window -lsfml-system
+LDFLAGS      	=	-shared -lsfml-graphics -lsfml-window -lsfml-system -rdynamic -g
 
 all: $(TARGET_LIB)
 

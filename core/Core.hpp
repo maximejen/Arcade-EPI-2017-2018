@@ -40,7 +40,7 @@ namespace Arcade {
 		void setGameLoader(const GameLibLoader &gameLoader);
 		const GraphLibLoader &getGraphLoader() const;
 		void setGraphLoader(const GraphLibLoader &graphLoader);
-		void checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib, IGameLib *&gameLib);
+		bool checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib, IGameLib *&gameLib);
 
 	private:
 		int arcadeLoop(IGraphicLib *, IGameLib *, Keys);
