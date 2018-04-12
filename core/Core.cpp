@@ -82,12 +82,12 @@ int Arcade::Core::startArcade()
 		return 0;
 	if (!this->gameLoader.loadLib(this->gamePathes[this->selectedGame]))
 		return 0;
-	auto graphLib = this->graphLoader.getLibInstance();
-	auto gameLib = this->gameLoader.getLibInstance();
-	//if (!this->playerName->setPlayerName(*graphLib))
-	//	return 1;
+	this->graphlib= this->graphLoader.getLibInstance();
+	this->gameLib = this->gameLoader.getLibInstance();
+	if (!this->playerName->setPlayerName(*this->graphlib))
+		return 1;
 	while (ctn) {
-		if (this->arcadeLoop(graphLib, gameLib, key) == 0)
+		if (this->arcadeLoop(key) == 0)
 			ctn = false;
 	}
 	this->gameLoader.unloadLib();
@@ -95,22 +95,17 @@ int Arcade::Core::startArcade()
 	return 1;
 }
 
-int Arcade::Core::arcadeLoop(IGraphicLib *graphLib, IGameLib *gameLib, Keys key)
+int Arcade::Core::arcadeLoop(Keys key)
 {
-	while (graphLib->pollEvents()) {
-		key = graphLib->getLastEvent();
+	while (this->graphlib->pollEvents()) {
+		key = this->graphlib->getLastEvent();
 		if (key == Arcade::Keys::ESC)
 			return 0;
-		if (!this->checkEvents(key, graphLib, gameLib)) {
-//			std::cout << "Swtiching to other lib" << std::endl;
-			break;
-		}
+		this->checkEvents(key);
 		gameLib->applyEvent(key);
 	}
-//	std::cout << "Switch toooooooo : " << graphLib->getName() << std::endl;
-
-	gameLib->update();
-	gameLib->refresh(*graphLib);
+	this->gameLib->update();
+	this->gameLib->refresh(*this->graphlib);
 	return 1;
 }
 
@@ -134,8 +129,7 @@ void Arcade::Core::setGraphLoader(const Arcade::GraphLibLoader &graphLoader)
 	Core::graphLoader = graphLoader;
 }
 
-bool Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
-	IGameLib *&gameLib)
+bool Arcade::Core::checkEvents(Arcade::Keys key)
 {
 	if (key == Arcade::Keys::I) {
 		size_t size = this->libraryPathes.size();
@@ -143,8 +137,8 @@ bool Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
 		this->selectedLib++;
 		this->graphLoader.loadLib(
 			this->libraryPathes[this->selectedLib % size]);
-		graphicLib = this->graphLoader.getLibInstance();
-		std::cout << "Switch to : " << graphicLib->getName() << std::endl;
+		this->graphlib = this->graphLoader.getLibInstance();
+		std::cout << "Switch to : " << this->graphlib->getName() << std::endl;
 		return false;
 	}
 	if (key == Arcade::Keys::O) {
@@ -153,8 +147,8 @@ bool Arcade::Core::checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib,
 		this->selectedGame++;
 		this->gameLoader.loadLib(
 			this->gamePathes[this->selectedGame % size]);
-		gameLib = this->gameLoader.getLibInstance();
-		gameLib->init();
+		this->gameLib = this->gameLoader.getLibInstance();
+		this->gameLib->init();
 		return false;
 	}
 	return true;

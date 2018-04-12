@@ -7,18 +7,18 @@
 
 CC 		= 	g++
 RM 		= 	rm -f
-TARGET_LIB 	= 	lib_arcade_snake.so
+TARGET_LIB 	= 	lib_arcade_nibbler.so
 
 SRCS		= 	./entryPoint.cpp			\
 			./LibSnake.cpp				\
-			./PixelBox.cpp				\
-			./TextBox.cpp				\
-			./Color.cpp
+			../../../core/PixelBox.cpp		\
+			../../../core/TextBox.cpp		\
+			../../../core/Color.cpp
 
 OBJS 		= 	$(SRCS:.cpp=.o)
 
 CXXFLAGS 	= 	-I. -I ../../../core
-CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC
+CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC -rdynamic
 LDFLAGS      	=	-shared -lncurses
 
 all: $(TARGET_LIB)

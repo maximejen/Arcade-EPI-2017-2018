@@ -41,13 +41,13 @@ namespace Arcade {
 		size_t getMaxY() const override;
 
 	private:
+		sf::Text text;
 		std::queue<Arcade::Keys> events;
 		Vect<size_t> screenSize;
 		sf::RenderWindow window;
 		sf::Texture texture;
 		sf::Sprite sprite;
 		sf::Font font;
-		sf::Text text;
 	};
 };
 

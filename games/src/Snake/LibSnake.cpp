@@ -148,12 +148,10 @@ void Arcade::LibSnake::update()
 
 void Arcade::LibSnake::refresh(IGraphicLib &graphicLib)
 {
-	if (this->resize.getX() == 0) {
-		Vect<size_t> size = graphicLib.getScreenSize();
-		this->resize.setX(size.getX() / MAP_WIDTH);
-		this->resize.setY(size.getY() / MAP_HEIGHT);
-		this->msgScore->setPos({size.getY() / 40, size.getX() / 70});
-	}
+	Vect<size_t> size = graphicLib.getScreenSize();
+	this->resize.setY(size.getX() / MAP_WIDTH);
+	this->resize.setX(size.getY() / MAP_HEIGHT);
+	this->msgScore->setPos({size.getY() / 40, size.getX() / 70});
 	std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timeDisplay);
 	if (time_span.count() >= 0.1) {
@@ -171,7 +169,7 @@ void Arcade::LibSnake::displaymap(IGraphicLib &graphicLib)
 	for (int i = 0; i < (int)NIBBLER_MAP.size(); i++) {
 		for (int j = 0; j < (int)NIBBLER_MAP[i].size(); j++) {
 			if (NIBBLER_MAP[i][j] == 'X')
-				this->drawPlayer(i,j,  graphicLib, {255, 0, 178, 255}, false);
+				this->drawPlayer(i,j,  graphicLib, {0, 255, 50, 255}, false);
 		}
 	}
 }
@@ -181,19 +179,24 @@ void Arcade::LibSnake::display(IGraphicLib &graphicLib)
 	this->drawPlayer(this->objectPos.getY(), this->objectPos.getX(), graphicLib, {244, 65, 65, 255},
 			 true);
 	for (int i = 0; i < (int)this->playerPos.size(); i++) {
-		this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {244, 255, 255, 255},
+		if (i == 0) {
+			this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {0, 255, 255, 255},
+					 true);
+
+		} else
+			this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {244, 255, 255, 255},
 				 true);
 	}
 }
 
-void Arcade::LibSnake::drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,
+void Arcade::LibSnake::drawPlayer(size_t x, size_t y, IGraphicLib &graphicLib,
 				  Color color, bool space)
 {
 	y = y * this->resize.getY();
 	x = x * this->resize.getX();
 		Arcade::PixelBox pixelBox({this->resize.getX(), this->resize.getY()}, {y , x}, color);
-	if (space)
-		pixelBox.setSize({this->resize.getX() -1, this->resize.getY() -1});
+	if (space && graphicLib.getName() != "Ncurses")
+		pixelBox.setSize({this->resize.getX() - 1, this->resize.getY() - 1});
 	graphicLib.drawPixelBox(pixelBox);
 }
 
@@ -300,7 +303,7 @@ bool Arcade::LibSnake::canGoBack(Keys key)
 	} else if (key == Keys::Q && this->playerPos[1].second + 1 != this->playerPos[0].second) {
 		ret = true;
 
-	} else if (key == Keys::D && this->playerPos[1].second + 1 != this->playerPos[0].second) {
+	} else if (key == Keys::D && this->playerPos[1].second - 1 != this->playerPos[0].second) {
 		ret = true;
 	} else
 		ret = false;

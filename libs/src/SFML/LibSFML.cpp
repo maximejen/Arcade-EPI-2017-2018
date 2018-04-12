@@ -54,23 +54,22 @@ static const std::unordered_map<sf::Keyboard::Key, Arcade::Keys> SFML_KEYS = {
 
 Arcade::LibSFML::LibSFML(Arcade::Vect<size_t> screenSize,
 	const std::string &title)
-	: events(), screenSize(screenSize),
+	: text(), events(), screenSize(screenSize),
 	  window(), texture(), sprite(this->texture), font()
 {
 	auto x = static_cast<unsigned int>(screenSize.getX());
 	auto y = static_cast<unsigned int>(screenSize.getY());
 
-	this->text.setFont(font);
-	this->text.setString("");
-	this->window.create({x, y, 32}, title.c_str());
 	this->font.loadFromFile("libs/src/SFML/OpenSans-Bold.ttf");
+	this->text.setFont(font);
+	this->window.create({x, y, 32}, title);
 	this->texture.create(x, y);
 }
 
 Arcade::LibSFML::~LibSFML()
 {
 	if (this->isOpen())
-		this->closeRenderer();
+		this->window.close();
 }
 
 std::string Arcade::LibSFML::getName() const
@@ -112,7 +111,8 @@ bool Arcade::LibSFML::pollEvents()
 
 	while (this->window.pollEvent(event)) {
 		try {
-			this->events.push(SFML_KEYS.at(event.key.code));
+			if (event.type != sf::Event::KeyReleased)
+				this->events.push(SFML_KEYS.at(event.key.code));
 		}
 		catch (std::exception &e) {
 			std::cout << e.what() << std::endl;
@@ -156,13 +156,13 @@ void Arcade::LibSFML::drawPixelBox(Arcade::PixelBox &b)
 	if (this->isOpen()) {
 		auto array = &b.getPixelArray()[0];
 		this->texture.update((unsigned char *) array,
-				     static_cast<unsigned int>(b.getWidth()),
-				     static_cast<unsigned int>(b.getHeight()),
-				     0, 0);
+				static_cast<unsigned int>(b.getWidth()),
+				static_cast<unsigned int>(b.getHeight()),
+				0, 0);
 		spr.setTexture(this->texture);
-		spr.setPosition(b.getY(), b.getX());
+		spr.setPosition(b.getX(), b.getY());
 		spr.setTextureRect({0, 0, static_cast<int>(b.getWidth()),
-				    static_cast<int>(b.getHeight())});
+				static_cast<int>(b.getHeight())});
 		this->window.draw(spr);
 	}
 }
@@ -170,14 +170,16 @@ void Arcade::LibSFML::drawPixelBox(Arcade::PixelBox &b)
 void Arcade::LibSFML::drawText(Arcade::TextBox &t)
 {
 	auto col = t.getColor();
+//	static sf::Text text;
 
 	if (this->isOpen()) {
+		text.setFont(font);
 		text.setString(t.getValue());
 		text.setCharacterSize(
 			static_cast<unsigned int>(t.getFontSize()));
 		text.setPosition(t.getX(), t.getY());
 		text.setColor({col.getRed(), col.getGreen(), col.getBlue(),
-			       col.getAlpha()});
+			col.getAlpha()});
 		this->window.draw(text);
 	}
 }

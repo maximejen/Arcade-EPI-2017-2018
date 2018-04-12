@@ -223,7 +223,7 @@ void Arcade::LibNcurses::drawPixel(int x, int y, char c,
 	short pair = 0;
 
 	this->init_ncurse_color(color, color, pair);
-	mvprintw(x, y, "%c", c);
+	mvprintw(y, x, "%c", c);
 	this->resetColor(pair);
 }
 

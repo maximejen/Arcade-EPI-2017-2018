@@ -10,6 +10,7 @@
 
 	#include <string>
 	#include <vector>
+	#include <unistd.h>
 	#include "../libs/src/IGraphicLib.hpp"
 	#include "../games/src/IGameLib.hpp"
 	#include "PlayerName.hpp"
@@ -40,10 +41,10 @@ namespace Arcade {
 		void setGameLoader(const GameLibLoader &gameLoader);
 		const GraphLibLoader &getGraphLoader() const;
 		void setGraphLoader(const GraphLibLoader &graphLoader);
-		bool checkEvents(Arcade::Keys key, IGraphicLib *&graphicLib, IGameLib *&gameLib);
+		bool checkEvents(Arcade::Keys key);
 
 	private:
-		int arcadeLoop(IGraphicLib *, IGameLib *, Keys);
+		int arcadeLoop(Keys);
 
 		std::vector<std::string> libraryPathes;
 		std::vector<std::string> gamePathes;
@@ -52,6 +53,8 @@ namespace Arcade {
 		int selectedGame;
 		int selectedLib;
 		PlayerName *playerName;
+		IGraphicLib *graphlib;
+		IGameLib *gameLib;
 	};
 }
 

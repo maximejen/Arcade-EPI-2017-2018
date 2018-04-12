@@ -77,6 +77,7 @@ Arcade::LibSDL::LibSDL(Vect<size_t> screenSize, const std::string &name)
 Arcade::LibSDL::~LibSDL()
 {
 	SDL_DestroyWindow(this->window);
+	TTF_Quit();
 	SDL_Quit();
 }
 
@@ -132,8 +133,10 @@ void Arcade::LibSDL::drawPixelBox(PixelBox &box)
 						      j).getBlue(),
 					       col.at(i * box.getWidth() +
 						      j).getAlpha());
-			SDL_RenderDrawPoint(this->renderer, box.getY() + i,
-					    box.getX() + j);
+			//SDL_RenderDrawPoint(this->renderer, box.getY() + i,
+					    //box.getX() + j);
+			SDL_RenderDrawPoint(this->renderer, box.getX() + j,
+					    box.getY() + i);
 		}
 	}
 }
@@ -187,7 +190,7 @@ bool Arcade::LibSDL::pollEvents()
 
 	if (event.type != 0 && event.key.keysym.sym != 0) {
 		if (SDL_KEYS_List.find(event.key.keysym.sym) !=
-		    SDL_KEYS_List.end()) {
+		    SDL_KEYS_List.end() && event.type != 769) {
 			this->events.push(
 				SDL_KEYS_List.at(event.key.keysym.sym));
 		}

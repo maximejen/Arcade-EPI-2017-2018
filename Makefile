@@ -24,12 +24,7 @@ OBJ		=	$(SRC:.cpp=.o)
 
 NAME		=	arcade
 
-all: $(NAME)
-
-$(NAME): $(OBJ)
-	make -C ./libs
-	make -C ./games
-	g++ -o $(NAME) $(OBJ) $(LIBFLAGS)
+all: games graphicals core
 
 core: $(OBJ)
 	g++ -o $(NAME) $(OBJ) $(LIBFLAGS)
