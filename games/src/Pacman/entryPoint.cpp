@@ -6,7 +6,7 @@
 */
 
 #include <iostream>
-#include "LibSnake.hpp"
+#include "LibPacman.hpp"
 
 /* "Arcade::SFML" : For example, use the class of your lib */
 Arcade::IGameLib *ret = nullptr;
@@ -15,7 +15,7 @@ __attribute__((constructor))
 void enter()
 {
 	/* Again, it's for example, use the class of your lib */
-	ret = new Arcade::LibSnake;
+	ret = new Arcade::LibPacman;
 }
 
 __attribute__((destructor))

@@ -19,10 +19,10 @@
 #define MAP_HEIGHT 29
 
 namespace Arcade {
-	class LibSnake : public IGameLib {
+	class LibPacman : public IGameLib {
 	public:
-		LibSnake();
-		~LibSnake() override;
+		LibPacman();
+		~LibPacman() override;
 
 		/* Get the name of the game */
 		const std::string getName() const override ;

@@ -10,7 +10,7 @@ RM 		= 	rm -f
 TARGET_LIB 	= 	lib_arcade_nibbler.so
 
 SRCS		= 	./entryPoint.cpp			\
-			./LibSnake.cpp				\
+			./LibNibbler.cpp			\
 			../../../core/PixelBox.cpp		\
 			../../../core/TextBox.cpp		\
 			../../../core/Color.cpp

@@ -8,7 +8,7 @@
 #include <ios>
 #include <iostream>
 #include <cstdlib>
-#include "LibSnake.hpp"
+#include "LibPacman.hpp"
 
 static const std::vector<std::string> NIBBLER_MAP = {
 	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -43,7 +43,7 @@ static const std::vector<std::string> NIBBLER_MAP = {
 	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 };
 
-Arcade::LibSnake::LibSnake()
+Arcade::LibPacman::LibPacman()
 {
 	srand(time(NULL));
 	this->init();
@@ -58,17 +58,17 @@ Arcade::LibSnake::LibSnake()
 
 }
 
-Arcade::LibSnake::~LibSnake()
+Arcade::LibPacman::~LibPacman()
 {
 	delete this->msgScore;
 }
 
-const std::string Arcade::LibSnake::getName() const
+const std::string Arcade::LibPacman::getName() const
 {
-	return "Snake";
+	return "Nibbler";
 }
 
-bool Arcade::LibSnake::init()
+bool Arcade::LibPacman::init()
 {
 	std::pair<int, int> pos;
 
@@ -93,7 +93,7 @@ bool Arcade::LibSnake::init()
 	return true;
 }
 
-bool Arcade::LibSnake::checkSpawnPos()
+bool Arcade::LibPacman::checkSpawnPos()
 {
 	for (int i = 0; i < (int)this->playerPos.size(); i++) {
 		if (((int)this->objectPos.getY() == (int)this->playerPos[i].first &&
@@ -106,7 +106,7 @@ bool Arcade::LibSnake::checkSpawnPos()
 	return true;
 }
 
-void Arcade::LibSnake::setObjectPos()
+void Arcade::LibPacman::setObjectPos()
 {
 	this->objectPos.setY(rand() % MAP_HEIGHT);
 	this->objectPos.setX(rand() % MAP_WIDTH);
@@ -115,17 +115,17 @@ void Arcade::LibSnake::setObjectPos()
 	this->checkSpawnPos();
 }
 
-bool Arcade::LibSnake::stop()
+bool Arcade::LibPacman::stop()
 {
 	return true;
 }
 
-void Arcade::LibSnake::applyEvent(Keys key)
+void Arcade::LibPacman::applyEvent(Keys key)
 {
 	this->curKey = key;
 }
 
-void Arcade::LibSnake::update()
+void Arcade::LibPacman::update()
 {
 	std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timer);
@@ -146,7 +146,7 @@ void Arcade::LibSnake::update()
 	this->timer = t2;
 }
 
-void Arcade::LibSnake::refresh(IGraphicLib &graphicLib)
+void Arcade::LibPacman::refresh(IGraphicLib &graphicLib)
 {
 	Vect<size_t> size = graphicLib.getScreenSize();
 	this->resize.setY(size.getX() / MAP_WIDTH);
@@ -164,7 +164,7 @@ void Arcade::LibSnake::refresh(IGraphicLib &graphicLib)
 	}
 }
 
-void Arcade::LibSnake::displaymap(IGraphicLib &graphicLib)
+void Arcade::LibPacman::displaymap(IGraphicLib &graphicLib)
 {
 	for (int i = 0; i < (int)NIBBLER_MAP.size(); i++) {
 		for (int j = 0; j < (int)NIBBLER_MAP[i].size(); j++) {
@@ -174,7 +174,7 @@ void Arcade::LibSnake::displaymap(IGraphicLib &graphicLib)
 	}
 }
 
-void Arcade::LibSnake::display(IGraphicLib &graphicLib)
+void Arcade::LibPacman::display(IGraphicLib &graphicLib)
 {
 	this->drawPlayer(this->objectPos.getY(), this->objectPos.getX(), graphicLib, {244, 65, 65, 255},
 			 true);
@@ -189,7 +189,7 @@ void Arcade::LibSnake::display(IGraphicLib &graphicLib)
 	}
 }
 
-void Arcade::LibSnake::drawPlayer(size_t x, size_t y, IGraphicLib &graphicLib,
+void Arcade::LibPacman::drawPlayer(size_t x, size_t y, IGraphicLib &graphicLib,
 				  Color color, bool space)
 {
 	y = y * this->resize.getY();
@@ -200,7 +200,7 @@ void Arcade::LibSnake::drawPlayer(size_t x, size_t y, IGraphicLib &graphicLib,
 	graphicLib.drawPixelBox(pixelBox);
 }
 
-int Arcade::LibSnake::checkFood(Keys dir)
+int Arcade::LibPacman::checkFood(Keys dir)
 {
 	if (dir == Keys::Z) {
 		if (this->playerPos[0].first -1 == (int)this->objectPos.getY() &&
@@ -236,7 +236,7 @@ int Arcade::LibSnake::checkFood(Keys dir)
 
 
 
-void Arcade::LibSnake::movePlayer(Keys dir)
+void Arcade::LibPacman::movePlayer(Keys dir)
 {
 	std::cout << "key : " << dir << std::endl;
 	if (this->checkFood(dir) == 1) {
@@ -267,7 +267,7 @@ void Arcade::LibSnake::movePlayer(Keys dir)
 		exit(0);
 }
 
-bool Arcade::LibSnake::checkEnd()
+bool Arcade::LibPacman::checkEnd()
 {
 	bool ret = false;
 
@@ -289,7 +289,7 @@ bool Arcade::LibSnake::checkEnd()
 	return ret;
 }
 
-bool Arcade::LibSnake::canGoBack(Keys key)
+bool Arcade::LibPacman::canGoBack(Keys key)
 {
 	bool ret = true;
 
@@ -310,7 +310,7 @@ bool Arcade::LibSnake::canGoBack(Keys key)
 	return ret;
 }
 
-void Arcade::LibSnake::moveSnake()
+void Arcade::LibPacman::moveSnake()
 {
 	auto tmp = this->playerPos;
 	for (int i = 1; i < (int)this->playerPos.size(); i++) {
@@ -319,7 +319,7 @@ void Arcade::LibSnake::moveSnake()
 	}
 }
 
-size_t Arcade::LibSnake::getScore()
+size_t Arcade::LibPacman::getScore()
 {
 	return this->score;
 }
