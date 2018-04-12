@@ -29,7 +29,7 @@ set(sources
         games/src/Pacman/entryPoint.cpp
         games/src/Nibbler/LibNibbler.hpp
         games/src/Pacman/LibPacman.cpp
-        games/src/Pacman/LibPacman.hpp)
+        games/src/Pacman/LibPacman.hpp games/src/Nibbler/LibNibbler.cpp)
 
 set(lib_ncurse_sources libs/src/ncurses/entryPoint.cpp libs/src/ncurses/LibNcurses.cpp libs/src/ncurses/LibNcurses.hpp)
 
