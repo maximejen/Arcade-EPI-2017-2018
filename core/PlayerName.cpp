@@ -5,224 +5,76 @@
 **        ${Description}
 */
 
-#include <unordered_map>
-#include <iostream>
-#include <ios>
+#include "PlayerName.hpp"
 #include <unistd.h>
-#include "LibSDL.hpp"
 
-static const std::unordered_map<int, Arcade::Keys> SDL_KEYS_List = {
-	{0,              Arcade::NONE},
-	{SDLK_a,         Arcade::A},
-	{SDLK_b,         Arcade::B},
-	{SDLK_c,         Arcade::C},
-	{SDLK_d,         Arcade::D},
-	{SDLK_e,         Arcade::E},
-	{SDLK_f,         Arcade::F},
-	{SDLK_g,         Arcade::G},
-	{SDLK_h,         Arcade::H},
-	{SDLK_i,         Arcade::I},
-	{SDLK_j,         Arcade::J},
-	{SDLK_k,         Arcade::K},
-	{SDLK_l,         Arcade::L},
-	{SDLK_m,         Arcade::M},
-	{SDLK_n,         Arcade::N},
-	{SDLK_o,         Arcade::O},
-	{SDLK_p,         Arcade::P},
-	{SDLK_q,         Arcade::Q},
-	{SDLK_r,         Arcade::R},
-	{SDLK_s,         Arcade::S},
-	{SDLK_t,         Arcade::T},
-	{SDLK_u,         Arcade::U},
-	{SDLK_v,         Arcade::V},
-	{SDLK_w,         Arcade::W},
-	{SDLK_x,         Arcade::X},
-	{SDLK_y,         Arcade::Y},
-	{SDLK_z,         Arcade::Z},
-	{SDLK_LEFT,      Arcade::LEFT},
-	{SDLK_RIGHT,     Arcade::RIGHT},
-	{SDLK_UP,        Arcade::UP},
-	{SDLK_DOWN,      Arcade::DOWN},
-	{SDLK_KP_ENTER,  Arcade::ENTER},
-	{SDLK_SPACE,     Arcade::SPACE},
-	{SDLK_DELETE,    Arcade::DELETE},
-	{SDLK_BACKSPACE, Arcade::BACKSPACE},
-	{SDLK_TAB,       Arcade::TAB},
-	{SDLK_ESCAPE,    Arcade::ESC},
-	{SDLK_a,         Arcade::MOUSELEFT},
-	{SDLK_a,         Arcade::MOUSERIGHT}
-};
+static const std::string INFOMSG= "Enter you Nickname, Press enter when done Press Escape to exit";
 
-Arcade::LibSDL::LibSDL(Vect<size_t> screenSize, const std::string &name)
+Arcade::PlayerName::PlayerName()
 {
-	SDL_Init(SDL_INIT_VIDEO);
-	TTF_Init();
+	std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+	this->playerName.clear();
+	this->timer = t1;
+}
 
-	this->screenSize = screenSize;
-	this->window = NULL;
-	this->window = SDL_CreateWindow(name.c_str(),
-					SDL_WINDOWPOS_UNDEFINED,
-					SDL_WINDOWPOS_UNDEFINED,
-					static_cast<int>(screenSize.getX()),
-					static_cast<int>(screenSize.getY()),
-					SDL_WINDOW_SHOWN);
-	this->renderer = SDL_CreateRenderer(this->window,
-					    -1, SDL_RENDERER_ACCELERATED);
-	if (!this->window) {
-		std::cout << "Cant create WIndow" << std::endl;
-		exit(0);
+bool Arcade::PlayerName::setPlayerName(IGraphicLib &graphLib)
+{
+	Keys curKey = Keys::NONE;
+	Vect<size_t> size = graphLib.getScreenSize();
+	Arcade::TextBox text("Name ", {size.getY() / 5, size.getX() / 3}, 25);
+	Arcade::TextBox info(INFOMSG, {size.getY() / 2, 50}, 20);
+	while (curKey != Keys::DOWN) {
+		while (graphLib.pollEvents()) {
+			if (endEntry(curKey))
+				return true;
+			if (!this->endescape(curKey))
+				return false;
+			curKey = graphLib.getLastEvent();
+			this->addNewLetter(curKey);
+		}
+		text.setValue("Name: " + this->playerName);
+		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timer);
+		if (time_span.count() >= 0.2) {
+			graphLib.clearWindow();
+			graphLib.drawText(text);
+			graphLib.drawText(info);
+			graphLib.refreshWindow();
+			this->timer = t2;
+		}
 	}
+	return true;
 }
 
-Arcade::LibSDL::~LibSDL()
+bool Arcade::PlayerName::endescape(Keys curKey)
 {
-	SDL_DestroyWindow(this->window);
-	TTF_Quit();
-	SDL_Quit();
+	if (curKey == Keys::ESC)
+		return false;
+	return true;
 }
 
-bool Arcade::LibSDL::isOpen() const
+bool Arcade::PlayerName::endEntry(Keys curKey)
 {
-	if (this->renderer)
+	if (curKey == Keys::SPACE)
 		return true;
 	return false;
 }
 
-void Arcade::LibSDL::closeRenderer()
+void Arcade::PlayerName::addNewLetter(Keys curKey)
 {
-	SDL_DestroyWindow(this->window);
-}
-
-void Arcade::LibSDL::openRenderer(std::string const &title)
-{
-	this->window = SDL_CreateWindow(title.c_str(),
-					SDL_WINDOWPOS_CENTERED,
-					SDL_WINDOWPOS_CENTERED,
-					(int) screenSize.getY(),
-					(int) screenSize.getX(),
-					SDL_WINDOW_SHOWN);
-	this->renderer = SDL_CreateRenderer(this->window,
-					    -1, SDL_RENDERER_ACCELERATED);
-}
-
-void Arcade::LibSDL::clearWindow()
-{
-	SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
-
-	SDL_RenderClear(this->renderer);
-}
-
-void Arcade::LibSDL::refreshWindow()
-{
-	SDL_RenderPresent(this->renderer);
-}
-
-void Arcade::LibSDL::drawPixelBox(PixelBox &box)
-{
-	std::vector<Color> col = box.getPixelArray();
-
-
-	for (int i = 0 ; i < (int) box.getHeight() ; i++) {
-		for (int j = 0 ; j < (int) box.getWidth() ; j++) {
-			SDL_SetRenderDrawColor(this->renderer,
-					       col.at(i * box.getWidth() +
-						      j).getRed(),
-					       col.at(i * box.getWidth() +
-						      j).getGreen(),
-					       col.at(i * box.getWidth() +
-						      j).getBlue(),
-					       col.at(i * box.getWidth() +
-						      j).getAlpha());
-			//SDL_RenderDrawPoint(this->renderer, box.getY() + i,
-					    //box.getX() + j);
-			SDL_RenderDrawPoint(this->renderer, box.getX() + j,
-					    box.getY() + i);
-		}
+	char val;
+	if (curKey == Keys::BACKSPACE)
+		this->playerName = this->playerName.substr(0,
+							   this->playerName.size() -
+							   1);
+	else if (this->playerName.size() < 13){
+		val = curKey + 96;
+		if (val >= 96 && val <= 122)
+			this->playerName += val;
 	}
 }
 
-void Arcade::LibSDL::drawText(TextBox &text)
+std::string Arcade::PlayerName::getPlayerName() const
 {
-	auto texW = (int) text.getX();
-	auto texH = (int) text.getY();
-
-	TTF_Font *font = TTF_OpenFont("./libs/src/SDL/OpenSans-Bold.ttf",
-				      text.getFontSize());
-	SDL_Color color = {text.getColor().getRed(),
-			   text.getColor().getGreen(),
-			   text.getColor().getBlue(),
-			   text.getColor().getAlpha()};
-	SDL_Surface *surface = TTF_RenderText_Solid(font,
-						    text.getValue().c_str(),
-						    color);
-
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(this->renderer,
-							    surface);
-	SDL_QueryTexture(texture, NULL, NULL, &texH, &texW);
-	SDL_Rect dstrect = {(int) text.getPos().getY(),
-			    (int) text.getPos().getX(),
-			    texH, texW};
-	SDL_RenderCopy(this->renderer, texture, NULL, &dstrect);
-	TTF_CloseFont(font);
-	SDL_DestroyTexture(texture);
-	SDL_FreeSurface(surface);
-}
-
-void Arcade::LibSDL::drawPixel(int x, int y, const Color &color)
-{
-	SDL_SetRenderDrawColor(this->renderer, color.getRed(),
-			       color.getGreen(),
-			       color.getBlue(), color.getAlpha());
-	SDL_RenderDrawPoint(this->renderer, y, x);
-
-}
-
-
-Arcade::Vect<size_t> Arcade::LibSDL::getScreenSize() const
-{
-	return this->screenSize;
-}
-
-bool Arcade::LibSDL::pollEvents()
-{
-	SDL_Event event;
-	SDL_PollEvent(&event);
-
-	if (event.type != 0 && event.key.keysym.sym != 0) {
-		if (SDL_KEYS_List.find(event.key.keysym.sym) !=
-		    SDL_KEYS_List.end() && event.type != 769) {
-			this->events.push(
-				SDL_KEYS_List.at(event.key.keysym.sym));
-		}
-	}
-	return !this->events.empty();
-}
-
-Arcade::Keys Arcade::LibSDL::getLastEvent()
-{
-	usleep(1);
-	Arcade::Keys ret = this->events.back();
-	this->events.pop();
-	return ret;
-}
-
-void Arcade::LibSDL::clearEvents()
-{
-	while (!this->events.empty())
-		this->events.pop();
-}
-
-size_t Arcade::LibSDL::getMaxX() const
-{
-	return this->screenSize.getX();
-}
-
-size_t Arcade::LibSDL::getMaxY() const
-{
-	return this->screenSize.getY();
-}
-
-std::string Arcade::LibSDL::getName() const
-{
-	return "SDL";
+	return this->playerName;
 }
