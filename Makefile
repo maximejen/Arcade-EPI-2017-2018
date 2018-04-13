@@ -14,7 +14,9 @@ SRC		=	main.cpp					\
 			core/PixelBox.cpp				\
 			core/TextBox.cpp				\
 			core/Color.cpp					\
-			core/PlayerName.cpp
+			core/PlayerScore.cpp				\
+			core/MenuManager.cpp				\
+			core/ScoreManager.cpp
 
 CXXFLAGS	=	-I./ -I./core -I./libs -I./games -W -Wall -Wextra -g -std=c++11 -rdynamic
 

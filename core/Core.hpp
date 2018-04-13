@@ -13,9 +13,10 @@
 	#include <unistd.h>
 	#include "../libs/src/IGraphicLib.hpp"
 	#include "../games/src/IGameLib.hpp"
-	#include "PlayerName.hpp"
+	#include "PlayerScore.hpp"
 	#include "GameLibLoader.hpp"
 	#include "GraphLibLoader.hpp"
+	#include "MenuManager.hpp"
 
 namespace Arcade {
 	// The core will be initialized by the main, then it will handle the program
@@ -45,16 +46,17 @@ namespace Arcade {
 
 	private:
 		int arcadeLoop(Keys);
-
+		bool initMenu();
 		std::vector<std::string> libraryPathes;
 		std::vector<std::string> gamePathes;
 		GameLibLoader gameLoader;
 		GraphLibLoader graphLoader;
 		int selectedGame;
 		int selectedLib;
-		PlayerName *playerName;
+		PlayerScore *playerName;
 		IGraphicLib *graphlib;
 		IGameLib *gameLib;
+		MenuManager *menuManager;
 	};
 }
 

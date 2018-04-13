@@ -25,11 +25,11 @@ set(sources
         libs/src/SDL/LibSDL.hpp
         libs/src/SDL/entryPoint.cpp
         games/src/Nibbler/entryPoint.cpp
-        games/src/Nibbler/LibNibbler.cpp core/PlayerName.cpp core/PlayerName.hpp
+        games/src/Nibbler/LibNibbler.cpp core/PlayerScore.cpp core/PlayerScore.hpp
         games/src/Pacman/entryPoint.cpp
         games/src/Nibbler/LibNibbler.hpp
         games/src/Pacman/LibPacman.cpp
-        games/src/Pacman/LibPacman.hpp games/src/Nibbler/LibNibbler.cpp)
+        games/src/Pacman/LibPacman.hpp games/src/Nibbler/LibNibbler.cpp core/MenuManager.cpp core/ScoreManager.cpp core/ScoreManager.hpp)
 
 set(lib_ncurse_sources libs/src/ncurses/entryPoint.cpp libs/src/ncurses/LibNcurses.cpp libs/src/ncurses/LibNcurses.hpp)
 

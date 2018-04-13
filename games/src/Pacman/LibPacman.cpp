@@ -10,37 +10,34 @@
 #include <cstdlib>
 #include "LibPacman.hpp"
 
-static const std::vector<std::string> NIBBLER_MAP = {
-	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-	"XXXXXX        XXX       XXX  X",
-	"X                            X",
-	"X       X             X      X",
-	"X       X             X      X",
-	"X       X             X      X",
-	"X                            X",
-	"X                            X",
-	"X  X                      X  X",
-	"X   X                    X   X",
-	"X   X        XXXXX       X   X",
-	"X  X        XXXXXXX       X  X",
-	"X           XXXXXXX          X",
-	"X      X    XXXXXXX    X     X",
-	"X     X      XXXXX      X    X",
-	"X     X                 X    X",
-	"X      X               X     X",
-	"X                            X",
-	"X                            X",
-	"X       X             X      X",
-	"X       X             X      X",
-	"X       X             X      X",
-	"X                            X",
-	"X  XXX        XXX       XXX  X",
-	"X        X          X        X",
-	"X         X        X         X",
-	"X          X      X          X",
-	"X                            X",
-	"XX                          XX",
-	"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+static const std::vector<std::string> PACMAN_MAP = {
+	"XXXXXXXXXXXXXXXXXXXXX",
+	"X.........X.........X",
+	"X.XXX.XXX.X.XXX.XXX.X",
+	"X°X X.X X.X.X X.X X°X",
+	"X.XXX.XXX.X.XXX.XXX.X",
+	"X...................X",
+	"X.XXX.X.XXXXX.X.XXX.X",
+	"X.XXX.X.XXXXX.X.XXX.X",
+	"X.....X...X...X.....X",
+	"XXXXX.XXX X XXX.XXXXX",
+	"    X.X       X.X    ",
+	"    X.X XX XX X.X    ",
+	"XXXXX.X X   X X.XXXXX",
+	"X    .  X   X  .    X",
+	"XXXXX.X XXXXX X.XXXXX",
+	"    X.X       X.X    ",
+	"    X.X XXXXX X.X    ",
+	"XXXXX.X XXXXX X.XXXXX",
+	"X.........X.........X",
+	"X.XXX.XXX.X.XXX.XXX.X",
+	"X°..X..... .....X..°X",
+	"XXX.X.X.XXXXX.X.X.XXX",
+	"XXX.X.X.XXXXX.X.X.XXX",
+	"X ....X...X...X.... X",
+	"X.XXXXXXX.X.XXXXXXX.X",
+	"X...................X",
+	"XXXXXXXXXXXXXXXXXXXXX"
 };
 
 Arcade::LibPacman::LibPacman()
@@ -75,21 +72,8 @@ bool Arcade::LibPacman::init()
 	this->mapSize.setX(MAP_WIDTH);
 	this->mapSize.setY(MAP_HEIGHT);
 
-	pos.first = 19;
-	pos.second = 15;
-	this->playerPos.push_back(pos);
-	pos.first = this->playerPos[0].first + 1;
-	pos.second = this->playerPos[0].second;
-	this->playerPos.push_back(pos);
-	pos.first = this->playerPos[0].first + 2;
-	pos.second = this->playerPos[0].second;
-	this->playerPos.push_back(pos);
-	pos.first = this->playerPos[0].first + 3;
-	pos.second = this->playerPos[0].second;
-	this->playerPos.push_back(pos);
-	this->objectPos.setY(5);
-	this->objectPos.setX(5);
-
+	this->pos.first = 10;
+	this->pos.second = 20;
 	return true;
 }
 
@@ -97,8 +81,8 @@ bool Arcade::LibPacman::checkSpawnPos()
 {
 	for (int i = 0; i < (int)this->playerPos.size(); i++) {
 		if (((int)this->objectPos.getY() == (int)this->playerPos[i].first &&
-			(int)this->objectPos.getX() == (int)this->playerPos[i].second) ||
-			(NIBBLER_MAP[this->objectPos.getY()][this->objectPos.getX()] == 'X')) {
+		     (int)this->objectPos.getX() == (int)this->playerPos[i].second) ||
+		    (PACMAN_MAP[this->objectPos.getY()][this->objectPos.getX()] == 'X')) {
 			std::cout << "Reload Object pos" << std::endl;
 			this->setObjectPos();
 		}
@@ -141,8 +125,6 @@ void Arcade::LibPacman::update()
 		this->lastKey = this->curKey;
 		this->curKey = Keys::NONE;
 	}
-	std::cout << "Taille: " << NIBBLER_MAP[0].size()<< std::endl;
-	std::cout << "Taille: " << NIBBLER_MAP.size()<< std::endl;
 	this->timer = t2;
 }
 
@@ -166,9 +148,9 @@ void Arcade::LibPacman::refresh(IGraphicLib &graphicLib)
 
 void Arcade::LibPacman::displaymap(IGraphicLib &graphicLib)
 {
-	for (int i = 0; i < (int)NIBBLER_MAP.size(); i++) {
-		for (int j = 0; j < (int)NIBBLER_MAP[i].size(); j++) {
-			if (NIBBLER_MAP[i][j] == 'X')
+	for (int i = 0; i < (int)PACMAN_MAP.size(); i++) {
+		for (int j = 0; j < (int)PACMAN_MAP[i].size(); j++) {
+			if (PACMAN_MAP[i][j] == 'X')
 				this->drawPlayer(i,j,  graphicLib, {0, 255, 50, 255}, false);
 		}
 	}
@@ -185,80 +167,35 @@ void Arcade::LibPacman::display(IGraphicLib &graphicLib)
 
 		} else
 			this->drawPlayer(this->playerPos[i].first, this->playerPos[i].second, graphicLib, {244, 255, 255, 255},
-				 true);
+					 true);
 	}
 }
 
 void Arcade::LibPacman::drawPlayer(size_t x, size_t y, IGraphicLib &graphicLib,
-				  Color color, bool space)
+	Color color, bool space)
 {
 	y = y * this->resize.getY();
 	x = x * this->resize.getX();
-		Arcade::PixelBox pixelBox({this->resize.getX(), this->resize.getY()}, {y , x}, color);
+	Arcade::PixelBox pixelBox({this->resize.getX(), this->resize.getY()}, {y , x}, color);
 	if (space && graphicLib.getName() != "Ncurses")
 		pixelBox.setSize({this->resize.getX() - 1, this->resize.getY() - 1});
 	graphicLib.drawPixelBox(pixelBox);
 }
 
-int Arcade::LibPacman::checkFood(Keys dir)
-{
-	if (dir == Keys::Z) {
-		if (this->playerPos[0].first -1 == (int)this->objectPos.getY() &&
-		    this->playerPos[0].second == (int)this->objectPos.getX()) {
-			//this->playerPos.insert(this->playerPos.begin(), std::make_pair(this->playerPos[0].first - 1, this->playerPos[0].second));
-			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
-			return (1);
-		}
-	}
-	else if (dir == Keys::S) {
-		if (this->playerPos[0].first + 1 == (int)this->objectPos.getY() &&
-		    this->playerPos[0].second == (int)this->objectPos.getX()) {
-			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
-			return (1);
-		}
-	}
-	else if (dir == Keys::Q) {
-		if (this->playerPos[0].first == (int)this->objectPos.getY() &&
-		    this->playerPos[0].second -1 == (int)this->objectPos.getX()) {
-			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
-			return (1);
-		}
-	}
-	else if (dir == Keys::D) {
-		if (this->playerPos[0].first == (int)this->objectPos.getY() &&
-		    this->playerPos[0].second + 1 == (int)this->objectPos.getX()) {
-			this->playerPos.push_back(std::make_pair(this->playerPos[this->playerPos.size() -1].first - 1, this->playerPos[this->playerPos.size() -1].second));
-			return (1);
-		}
-	}
-	return (0);
-}
-
-
-
 void Arcade::LibPacman::movePlayer(Keys dir)
 {
-	std::cout << "key : " << dir << std::endl;
-	if (this->checkFood(dir) == 1) {
-		this->setObjectPos();
-		this->score++;
-		this->msgScore->setValue("Score: " + std::to_string(this->score));
-		if (this->timeSleep > 0.3)
-			this->timeSleep -= 0.05;
-	}
-	this->moveSnake();
 	switch ((int)dir) {
 		case Keys::Z:
-			this->playerPos[0].first--;
+			this->pos.first++;
 			break;
 		case Keys::S :
-			this->playerPos[0].first++;
+			this->pos.first++;
 			break;
 		case Keys::Q :
-			this->playerPos[0].second--;
+			this->pos.second--;
 			break;
 		case Keys::D :
-			this->playerPos[0].second++;
+			this->pos.second++;
 			break;
 		default:
 			break;
@@ -284,7 +221,7 @@ bool Arcade::LibPacman::checkEnd()
 		ret = true;
 	else if (this->playerPos[0].second >= MAP_WIDTH)
 		ret = true;
-	if (NIBBLER_MAP[this->playerPos[0].first][this->playerPos[0].second] == 'X')
+	if (PACMAN_MAP[this->playerPos[0].first][this->playerPos[0].second] == 'X')
 		return true;
 	return ret;
 }
@@ -308,15 +245,6 @@ bool Arcade::LibPacman::canGoBack(Keys key)
 	} else
 		ret = false;
 	return ret;
-}
-
-void Arcade::LibPacman::moveSnake()
-{
-	auto tmp = this->playerPos;
-	for (int i = 1; i < (int)this->playerPos.size(); i++) {
-		this->playerPos[i].first = tmp[i -1].first;
-		this->playerPos[i].second = tmp[i -1].second;
-	}
 }
 
 size_t Arcade::LibPacman::getScore()

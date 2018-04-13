@@ -159,8 +159,8 @@ void Arcade::LibSDL::drawText(TextBox &text)
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(this->renderer,
 							    surface);
 	SDL_QueryTexture(texture, NULL, NULL, &texH, &texW);
-	SDL_Rect dstrect = {(int) text.getPos().getY(),
-			    (int) text.getPos().getX(),
+	SDL_Rect dstrect = {(int) text.getPos().getX(),
+			    (int) text.getPos().getY(),
 			    texH, texW};
 	SDL_RenderCopy(this->renderer, texture, NULL, &dstrect);
 	TTF_CloseFont(font);

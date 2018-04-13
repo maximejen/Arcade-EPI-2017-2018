@@ -21,7 +21,8 @@ Arcade::Core::Core(const std::string &libPath) : selectedGame(0),
 	this->libraryPathes.push_back(libPath);
 	this->parseLibDir();
 	this->parseGameDir();
-	this->playerName = new PlayerName;
+	this->playerName = new PlayerScore;
+	this->menuManager = new MenuManager;
 }
 
 Arcade::Core::~Core()
@@ -71,6 +72,33 @@ void Arcade::Core::parseGameDir()
 	}
 }
 
+bool Arcade::Core::initMenu()
+{
+	std::string lib;
+
+	this->menuManager->setLibPath(this->gamePathes, this->libraryPathes);
+	lib = this->menuManager->printMenu(*this->graphlib);
+	std::cout << "lib : " << lib << std::endl;
+	if (lib != "") {
+		if (std::find(this->gamePathes.begin(), this->gamePathes.end(), lib) != this->gamePathes.end()) {
+			this->gameLoader.unloadLib();
+			if (!this->gameLoader.loadLib(lib))
+				return false;
+			this->gameLib = this->gameLoader.getLibInstance();
+
+		}
+		else if (std::find(this->libraryPathes.begin(), this->libraryPathes.end(), lib) != this->libraryPathes.end()) {
+			this->graphLoader.unloadLib();
+			if (!this->graphLoader.loadLib(lib))
+				return false;
+			this->graphlib= this->graphLoader.getLibInstance();
+
+		}
+	}
+	this->menuManager->ScrenStart(*this->graphlib);
+	return true;
+}
+
 int Arcade::Core::startArcade()
 {
 	bool ctn = true;
@@ -85,11 +113,15 @@ int Arcade::Core::startArcade()
 	this->graphlib= this->graphLoader.getLibInstance();
 	this->gameLib = this->gameLoader.getLibInstance();
 	if (!this->playerName->setPlayerName(*this->graphlib))
+		return false;
+	if (!this->initMenu())
 		return 1;
 	while (ctn) {
 		if (this->arcadeLoop(key) == 0)
 			ctn = false;
 	}
+	this->playerName->setScore(this->gameLib->getScore());
+	this->playerName->writeScoreInFile();
 	this->gameLoader.unloadLib();
 	this->graphLoader.unloadLib();
 	return 1;
@@ -101,6 +133,8 @@ int Arcade::Core::arcadeLoop(Keys key)
 		key = this->graphlib->getLastEvent();
 		if (key == Arcade::Keys::ESC)
 			return 0;
+		if (key == Arcade::Keys::M)
+			this->initMenu();
 		this->checkEvents(key);
 		gameLib->applyEvent(key);
 	}
@@ -142,6 +176,7 @@ bool Arcade::Core::checkEvents(Arcade::Keys key)
 		return false;
 	}
 	if (key == Arcade::Keys::O) {
+		this->playerName->setScore((int)this->gameLib->getScore());
 		size_t size = this->gamePathes.size();
 		this->gameLoader.unloadLib();
 		this->selectedGame++;
@@ -149,6 +184,7 @@ bool Arcade::Core::checkEvents(Arcade::Keys key)
 			this->gamePathes[this->selectedGame % size]);
 		this->gameLib = this->gameLoader.getLibInstance();
 		this->gameLib->init();
+		this->playerName->writeScoreInFile();
 		return false;
 	}
 	return true;

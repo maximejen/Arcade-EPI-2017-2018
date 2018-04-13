@@ -15,8 +15,8 @@
 #include <pthread.h>
 #include <chrono>
 #include <ctime>
-#define MAP_WIDTH 29
-#define MAP_HEIGHT 29
+#define MAP_WIDTH 20
+#define MAP_HEIGHT 27
 
 namespace Arcade {
 	class LibPacman : public IGameLib {
@@ -59,8 +59,6 @@ namespace Arcade {
 		void display(IGraphicLib &graphicLib);
 		void drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,  Color color, bool space);
 		void movePlayer(Keys dir);
-		int checkFood(Keys dir);
-		void moveSnake();
 		bool canGoBack(Keys key);
 		bool checkEnd();
 		bool checkSpawnPos();
@@ -72,6 +70,8 @@ namespace Arcade {
 		std::chrono::steady_clock::time_point timer;
 		std::chrono::steady_clock::time_point timeDisplay;
 		double timeSleep;
+		std::pair<int, int> pos;
+		int playerDirection;
 	};
 };
 
