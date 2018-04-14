@@ -8,9 +8,12 @@
 #include <fstream>
 #include <dlfcn.h>
 #include <iostream>
+#include <regex>
 #include "GraphLibLoader.hpp"
 
 static const char MAGIC[4] = {0x7f, 'E', 'L', 'F'};
+
+static const std::regex REGEX_NAME(R"(^.*lib_arcade_.*.so)");
 
 Arcade::GraphLibLoader::GraphLibLoader() : libPath(""), handleAddr(),
 			       entryPointResult(), isLibLoaded(false)
@@ -52,6 +55,9 @@ bool Arcade::GraphLibLoader::loadLib(const std::string &libPath)
 
 bool Arcade::GraphLibLoader::isElfFile(const std::string &libPath) const
 {
+	std::cmatch cm;
+	if (!std::regex_match(libPath.c_str(), cm, REGEX_NAME))
+		return false;
 	std::ifstream lib(libPath);
 	char magic[5] = {0, 0, 0, 0, 0};
 	std::string tmp;

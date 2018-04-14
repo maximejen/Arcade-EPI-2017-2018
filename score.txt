@@ -1,3 +1,15 @@
 Unknow_Player 0
+dams 1
 Unknow_Player 2
+max 3
 Unknow_Player 4
+name 5
+max 7
+max 11
+max 25
+max 35
+max 37
+max 39
+max 50
+max 58
+max 64

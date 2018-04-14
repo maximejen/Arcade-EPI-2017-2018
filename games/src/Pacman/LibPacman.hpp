@@ -15,7 +15,7 @@
 #include <pthread.h>
 #include <chrono>
 #include <ctime>
-#define MAP_WIDTH 20
+#define MAP_WIDTH 27
 #define MAP_HEIGHT 27
 
 namespace Arcade {
@@ -55,14 +55,13 @@ namespace Arcade {
 		std::vector<std::pair<int, int>> playerPos;
 		Vect<size_t> objectPos;
 		Vect<size_t> mapSize;
-		void setObjectPos();
 		void display(IGraphicLib &graphicLib);
-		void drawPlayer(size_t y, size_t x, IGraphicLib &graphicLib,  Color color, bool space);
+		void drawRectangle(size_t y, size_t x, IGraphicLib &graphicLib,
+			Color color, bool space);
 		void movePlayer(Keys dir);
-		bool canGoBack(Keys key);
 		bool checkEnd();
-		bool checkSpawnPos();
 		void displaymap(IGraphicLib &graphicLib);
+		void drawFood(std::pair<size_t, size_t >, IGraphicLib &graphicLib, Color color, bool type);
 		TextBox *msgScore;
 		Vect<size_t>resize;
 		Keys curKey;
@@ -72,6 +71,8 @@ namespace Arcade {
 		double timeSleep;
 		std::pair<int, int> pos;
 		int playerDirection;
+		int lifes;
+		std::vector<std::string> map;
 	};
 };
 

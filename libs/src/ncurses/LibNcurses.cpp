@@ -73,6 +73,12 @@ static const std::vector<std::function<short(
 		return -1;
 	}},
 	{[](const Arcade::Color &color) {
+		if (PERCENT(color.getRed()) > 80 &&
+			PERCENT(color.getGreen()) > 80)
+			return COLOR_YELLOW;
+		return -1;
+	}},
+	{[](const Arcade::Color &color) {
 		if (PERCENT(color.getGreen()) < 80 &&
 		    PERCENT(color.getRed()) > 80 &&
 		    PERCENT(color.getBlue()) < 80)
@@ -84,12 +90,6 @@ static const std::vector<std::function<short(
 		    PERCENT(color.getRed()) < 80 &&
 		    PERCENT(color.getBlue()) < 80)
 			return COLOR_GREEN;
-		return -1;
-	}},
-	{[](const Arcade::Color &color) {
-		if (PERCENT(color.getRed()) > 80 &&
-		    PERCENT(color.getGreen()) > 80)
-			return COLOR_YELLOW;
 		return -1;
 	}},
 	{[](const Arcade::Color &color) {
@@ -172,7 +172,6 @@ void Arcade::LibNcurses::refreshWindow()
 	this->screenSize.setX(static_cast<size_t>(COLS));
 	this->screenSize.setY(static_cast<size_t>(LINES));
 	refresh();
-	//TODO:Gérer le resize
 }
 
 void Arcade::LibNcurses::clearWindow()

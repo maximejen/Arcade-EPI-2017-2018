@@ -23,6 +23,7 @@ Arcade::Core::Core(const std::string &libPath) : selectedGame(0),
 	this->parseGameDir();
 	this->playerName = new PlayerScore;
 	this->menuManager = new MenuManager;
+	this->scoreManager = new ScoreManager;
 }
 
 Arcade::Core::~Core()
@@ -135,6 +136,8 @@ int Arcade::Core::arcadeLoop(Keys key)
 			return 0;
 		if (key == Arcade::Keys::M)
 			this->initMenu();
+		if (key == Arcade::Keys::P)
+			this->scoreManager->printScore(*this->graphlib);
 		this->checkEvents(key);
 		gameLib->applyEvent(key);
 	}

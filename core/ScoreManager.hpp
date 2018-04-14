@@ -4,46 +4,29 @@
 ** File description:
 **        ${Description}
 */
+#ifndef CPP_ARCADE_SCOREMANAGER_HPP
+#define CPP_ARCADE_SCOREMANAGER_HPP
 
-#include "ScoreManager.hpp"
+#include "../libs/src/IGraphicLib.hpp"
+#include <iostream>
+#include <ios>
+#include <chrono>
+#include <fstream>
+#include <map>
 
-Arcade::ScoreManager::ScoreManager()
-{
-	std::ifstream file;
-	std::string line;
+namespace Arcade {
+	class ScoreManager {
+	public:
+		ScoreManager();
+		void printScore(IGraphicLib &graphLib);
 
-	file.open("score.txt", std::ifstream::in);
-	while (std::getline(file, line)) {
-		std::cout << line << std::endl;
-		this->score.insert(std::pair<int ,std::string>(std::stoi(line.substr(line.find(" "))), line.substr(0, line.find(" "))));
-	}
+	private:
+		void printPlayers(IGraphicLib &graphLib);
+		std::chrono::steady_clock::time_point timer;
+		std::map<int, std::string> score;
+
+
+	};
 }
 
-void Arcade::ScoreManager::printScore(IGraphicLib &graphLib)
-{
-	Keys curKey = Keys::NONE;
-
-	while (curKey != Keys::SPACE) {
-		while (graphLib.pollEvents()) {
-			curKey = graphLib.getLastEvent();
-		}
-		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timer);
-		if (time_span.count() >= 0.2) {
-			graphLib.clearWindow();
-			this->printPlayers(graphLib);
-			graphLib.refreshWindow();
-		}
-	}
-	//Arcade::TextBox text("Graphics", { size.getX() / 2, size.getY() / 6}, 25);
-
-}
-
-void Arcade::ScoreManager::printPlayers(IGraphicLib &graphLib)
-{
-	for(auto it = this->score.cbegin(); it != this->score.cend(); ++it) {
-		Arcade::TextBox text("Graphics", { size.getX() / 2, size.getY() / 6}, 25);
-
-	}
-
-}
+#endif //CPP_ARCADE_SCOREMANAGER_HPP

@@ -17,6 +17,7 @@
 	#include "GameLibLoader.hpp"
 	#include "GraphLibLoader.hpp"
 	#include "MenuManager.hpp"
+	#include "ScoreManager.hpp"
 
 namespace Arcade {
 	// The core will be initialized by the main, then it will handle the program
@@ -57,6 +58,7 @@ namespace Arcade {
 		IGraphicLib *graphlib;
 		IGameLib *gameLib;
 		MenuManager *menuManager;
+		ScoreManager *scoreManager;
 	};
 }
 

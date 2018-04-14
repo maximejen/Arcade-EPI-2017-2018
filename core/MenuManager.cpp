@@ -16,7 +16,7 @@ Arcade::MenuManager::MenuManager()
 }
 
 void Arcade::MenuManager::setLibPath(std::vector<std::string> &gameLib,
-				     std::vector<std::string> &graphLib)
+	std::vector<std::string> &graphLib)
 {
 	this->gameLib = gameLib;
 	this->graphLib = graphLib;
@@ -36,7 +36,8 @@ std::string Arcade::MenuManager::printMenu(IGraphicLib &graphLib)
 			this->moveCursos(curKey);
 		}
 		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
-		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - this->timer);
+		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(
+			t2 - this->timer);
 		if (time_span.count() >= 0.2) {
 			graphLib.clearWindow();
 			this->printGraphLib(graphLib, size);
@@ -60,10 +61,10 @@ std::string Arcade::MenuManager::returnValue()
 bool Arcade::MenuManager::canMoveDown()
 {
 	if (this->cursPos.first == 0) {
-		if (this->cursPos.second < (int)this->gameLib.size() - 1)
+		if (this->cursPos.second < (int) this->gameLib.size() - 1)
 			return true;
 	} else {
-		if (this->cursPos.second < (int)this->graphLib.size() - 1)
+		if (this->cursPos.second < (int) this->graphLib.size() - 1)
 			return true;
 	}
 	return false;
@@ -71,29 +72,31 @@ bool Arcade::MenuManager::canMoveDown()
 
 void Arcade::MenuManager::moveCursos(Keys key)
 {
-	if (key == UP && this->cursPos.second > 0)
+	if (key == Z && this->cursPos.second > 0)
 		this->cursPos.second--;
-	else if (key == DOWN && this->canMoveDown())
+	else if (key == S && this->canMoveDown())
 		this->cursPos.second++;
-	else if (key == LEFT && this->cursPos.first > 0 &&
-		this->cursPos.second < (int)this->gameLib.size())
+	else if (key == Q && this->cursPos.first > 0 &&
+		this->cursPos.second < (int) this->gameLib.size())
 		this->cursPos.first--;
-	else if (key == RIGHT && this->cursPos.first < 1 &&
-				 this->cursPos.second < (int)this->graphLib.size())
+	else if (key == D && this->cursPos.first < 1 &&
+		this->cursPos.second < (int) this->graphLib.size())
 		this->cursPos.first++;
 }
 
 void Arcade::MenuManager::printGraphLib(IGraphicLib &graphLib,
-					Vect<size_t> size)
+	Vect<size_t> size)
 {
 	size_t pos = 0;
 	size_t inc = size.getY() / 25;
 	int i = 0;
 
-	Arcade::TextBox text("Graphics", { size.getX() / 2, size.getY() / 6}, 25);
+	Arcade::TextBox text("Graphics", {size.getX() / 2, size.getY() / 6},
+		25);
 	graphLib.drawText(text);
-	for (auto& elem: this->graphLib) {
-		Arcade::TextBox text(elem.substr(elem.find('/') + 1), { size.getX() / 2, size.getY() / 5 + pos}, 25);
+	for (auto &elem: this->graphLib) {
+		Arcade::TextBox text(elem.substr(elem.find('/') + 1),
+			{size.getX() / 2, size.getY() / 5 + pos}, 25);
 		if (this->cursPos.first == 1 && this->cursPos.second == i)
 			text.setColor({244, 65, 65, 255});
 		graphLib.drawText(text);
@@ -102,15 +105,17 @@ void Arcade::MenuManager::printGraphLib(IGraphicLib &graphLib,
 	}
 }
 
-void Arcade::MenuManager::printGameLib(IGraphicLib &graphLib, Vect<size_t> size)
+void
+Arcade::MenuManager::printGameLib(IGraphicLib &graphLib, Vect<size_t> size)
 {
 	size_t pos = 0;
 	size_t inc = size.getY() / 25;
 	int i = 0;
 	Arcade::TextBox text("Games", {0, size.getY() / 6}, 25);
 	graphLib.drawText(text);
-	for (auto& elem: this->gameLib) {
-		Arcade::TextBox text(elem.substr(elem.find("/") + 1), {0 ,size.getY() / 5 + pos});
+	for (auto &elem: this->gameLib) {
+		Arcade::TextBox text(elem.substr(elem.find("/") + 1),
+			{0, size.getY() / 5 + pos});
 		if (this->cursPos.first == 0 && this->cursPos.second == i)
 			text.setColor({244, 65, 65, 255});
 		graphLib.drawText(text);
@@ -126,14 +131,16 @@ void Arcade::MenuManager::ScrenStart(IGraphicLib &graphLib)
 	time_t current;
 	int in = 3;
 	time(&timer);
-	Arcade::TextBox text("READY", {0, size.getY() / 6}, 25);
+	Arcade::TextBox text("READY : " + std::to_string(in),
+		{size.getX() / 2, size.getY() / 2}, 40);
 
 	graphLib.clearWindow();
+	return;
 	while (in > -1) {
 		time(&current);
 		if (current > timer) {
 			graphLib.clearWindow();
-			Arcade::TextBox text("READY : " + std::to_string(in), {size.getX() /2, size.getY() / 2}, 40);
+			text.setValue("READY : " + std::to_string(in));
 			timer = current;
 			graphLib.drawText(text);
 			graphLib.refreshWindow();
