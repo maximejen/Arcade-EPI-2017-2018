@@ -14,8 +14,9 @@ Arcade::ScoreManager::ScoreManager()
 
 	file.open("score.txt", std::ifstream::in);
 	while (std::getline(file, line)) {
-		std::cout << line << std::endl;
-		this->score.insert(std::pair<int ,std::string>(std::stoi(line.substr(line.find(" "))), line.substr(0, line.find(" "))));
+		if (std::regex_match(line, std::regex("^[a-zA-Z_]{0,} [0-9]{0,}"))) {
+			this->score.insert(std::pair<int ,std::string>(std::stoi(line.substr(line.find(" "))), line.substr(0, line.find(" "))));
+		}
 	}
 	std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 	this->timer = t1;

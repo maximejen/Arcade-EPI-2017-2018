@@ -28,7 +28,6 @@ std::string Arcade::MenuManager::printMenu(IGraphicLib &graphLib)
 
 	while (curKey != Keys::ESC) {
 		Vect<size_t> size = graphLib.getScreenSize();
-		//std::cerr << "Scren : " << size.getY() <<" : " << size.getX() << std::endl;
 		while (graphLib.pollEvents()) {
 			curKey = graphLib.getLastEvent();
 			if (curKey == Keys::SPACE)

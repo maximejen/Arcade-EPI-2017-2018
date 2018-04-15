@@ -19,7 +19,7 @@ OBJS 		= 	$(SRCS:.cpp=.o)
 
 CXXFLAGS 	= 	-I. -I ../../../core
 CXXFLAGS 	+= 	-W -Wall -Wextra -fPIC
-LDFLAGS      	=	-shared -lsfml-graphics -lsfml-window -lsfml-system -rdynamic -g
+LDFLAGS      	=	-shared -lsfml-graphics -lsfml-window -lsfml-system -rdynamic -std=c++11
 
 all: $(TARGET_LIB)
 

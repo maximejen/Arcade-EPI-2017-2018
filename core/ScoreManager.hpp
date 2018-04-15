@@ -13,6 +13,7 @@
 #include <chrono>
 #include <fstream>
 #include <map>
+#include <regex>
 
 namespace Arcade {
 	class ScoreManager {

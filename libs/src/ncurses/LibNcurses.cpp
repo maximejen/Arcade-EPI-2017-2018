@@ -130,9 +130,9 @@ Arcade::LibNcurses::~LibNcurses()
 bool Arcade::LibNcurses::pollEvents()
 {
 	timeout(0);
-	int event = getch();
+	int event;
 
-	if (event != 0 && event != ERR) {
+	while ((event = getch()) != 0 && event != ERR) {
 		if (NCURSES_KEYS.find(event) != NCURSES_KEYS.end())
 			this->events.push(NCURSES_KEYS.at(event));
 	}

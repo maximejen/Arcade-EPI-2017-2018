@@ -121,7 +121,7 @@ void Arcade::LibNibbler::setObjectPos()
 
 bool Arcade::LibNibbler::stop()
 {
-	return true;
+	return false;
 }
 
 void Arcade::LibNibbler::applyEvent(Keys key)

@@ -79,7 +79,6 @@ bool Arcade::Core::initMenu()
 
 	this->menuManager->setLibPath(this->gamePathes, this->libraryPathes);
 	lib = this->menuManager->printMenu(*this->graphlib);
-	std::cout << "lib : " << lib << std::endl;
 	if (lib != "") {
 		if (std::find(this->gamePathes.begin(), this->gamePathes.end(), lib) != this->gamePathes.end()) {
 			this->gameLoader.unloadLib();
@@ -95,7 +94,8 @@ bool Arcade::Core::initMenu()
 			this->graphlib= this->graphLoader.getLibInstance();
 
 		}
-	}
+	} else
+		return false;
 	this->menuManager->ScrenStart(*this->graphlib);
 	return true;
 }
@@ -141,6 +141,8 @@ int Arcade::Core::arcadeLoop(Keys key)
 		this->checkEvents(key);
 		gameLib->applyEvent(key);
 	}
+	if (this->gameLib->stop() && !this->initMenu())
+		return 0;
 	this->gameLib->update();
 	this->gameLib->refresh(*this->graphlib);
 	return 1;

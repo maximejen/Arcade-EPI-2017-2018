@@ -61,13 +61,13 @@ Arcade::LibSDL::LibSDL(Vect<size_t> screenSize, const std::string &name)
 	this->screenSize = screenSize;
 	this->window = NULL;
 	this->window = SDL_CreateWindow(name.c_str(),
-					SDL_WINDOWPOS_UNDEFINED,
-					SDL_WINDOWPOS_UNDEFINED,
-					static_cast<int>(screenSize.getX()),
-					static_cast<int>(screenSize.getY()),
-					SDL_WINDOW_SHOWN);
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+		static_cast<int>(screenSize.getX()),
+		static_cast<int>(screenSize.getY()),
+		SDL_WINDOW_SHOWN);
 	this->renderer = SDL_CreateRenderer(this->window,
-					    -1, SDL_RENDERER_ACCELERATED);
+		-1, SDL_RENDERER_ACCELERATED);
 	if (!this->window) {
 		std::cout << "Cant create WIndow" << std::endl;
 		exit(0);
@@ -96,13 +96,13 @@ void Arcade::LibSDL::closeRenderer()
 void Arcade::LibSDL::openRenderer(std::string const &title)
 {
 	this->window = SDL_CreateWindow(title.c_str(),
-					SDL_WINDOWPOS_CENTERED,
-					SDL_WINDOWPOS_CENTERED,
-					(int) screenSize.getY(),
-					(int) screenSize.getX(),
-					SDL_WINDOW_SHOWN);
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		(int)screenSize.getY(),
+		(int)screenSize.getX(),
+		SDL_WINDOW_SHOWN);
 	this->renderer = SDL_CreateRenderer(this->window,
-					    -1, SDL_RENDERER_ACCELERATED);
+		-1, SDL_RENDERER_ACCELERATED);
 }
 
 void Arcade::LibSDL::clearWindow()
@@ -122,46 +122,46 @@ void Arcade::LibSDL::drawPixelBox(PixelBox &box)
 	std::vector<Color> col = box.getPixelArray();
 
 
-	for (int i = 0 ; i < (int) box.getHeight() ; i++) {
-		for (int j = 0 ; j < (int) box.getWidth() ; j++) {
+	for (int i = 0 ; i < (int)box.getHeight() ; i++) {
+		for (int j = 0 ; j < (int)box.getWidth() ; j++) {
 			SDL_SetRenderDrawColor(this->renderer,
-					       col.at(i * box.getWidth() +
-						      j).getRed(),
-					       col.at(i * box.getWidth() +
-						      j).getGreen(),
-					       col.at(i * box.getWidth() +
-						      j).getBlue(),
-					       col.at(i * box.getWidth() +
-						      j).getAlpha());
+				col.at(i * box.getWidth() +
+					j).getRed(),
+				col.at(i * box.getWidth() +
+					j).getGreen(),
+				col.at(i * box.getWidth() +
+					j).getBlue(),
+				col.at(i * box.getWidth() +
+					j).getAlpha());
 			//SDL_RenderDrawPoint(this->renderer, box.getY() + i,
-					    //box.getX() + j);
+			//box.getX() + j);
 			SDL_RenderDrawPoint(this->renderer, box.getX() + j,
-					    box.getY() + i);
+				box.getY() + i);
 		}
 	}
 }
 
 void Arcade::LibSDL::drawText(TextBox &text)
 {
-	auto texW = (int) text.getX();
-	auto texH = (int) text.getY();
+	auto texW = (int)text.getX();
+	auto texH = (int)text.getY();
 
 	TTF_Font *font = TTF_OpenFont("./libs/src/SDL/OpenSans-Bold.ttf",
-				      text.getFontSize());
+		text.getFontSize());
 	SDL_Color color = {text.getColor().getRed(),
-			   text.getColor().getGreen(),
-			   text.getColor().getBlue(),
-			   text.getColor().getAlpha()};
+		text.getColor().getGreen(),
+		text.getColor().getBlue(),
+		text.getColor().getAlpha()};
 	SDL_Surface *surface = TTF_RenderText_Solid(font,
-						    text.getValue().c_str(),
-						    color);
+		text.getValue().c_str(),
+		color);
 
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(this->renderer,
-							    surface);
+		surface);
 	SDL_QueryTexture(texture, NULL, NULL, &texH, &texW);
-	SDL_Rect dstrect = {(int) text.getPos().getX(),
-			    (int) text.getPos().getY(),
-			    texH, texW};
+	SDL_Rect dstrect = {(int)text.getPos().getX(),
+		(int)text.getPos().getY(),
+		texH, texW};
 	SDL_RenderCopy(this->renderer, texture, NULL, &dstrect);
 	TTF_CloseFont(font);
 	SDL_DestroyTexture(texture);
@@ -171,8 +171,8 @@ void Arcade::LibSDL::drawText(TextBox &text)
 void Arcade::LibSDL::drawPixel(int x, int y, const Color &color)
 {
 	SDL_SetRenderDrawColor(this->renderer, color.getRed(),
-			       color.getGreen(),
-			       color.getBlue(), color.getAlpha());
+		color.getGreen(),
+		color.getBlue(), color.getAlpha());
 	SDL_RenderDrawPoint(this->renderer, y, x);
 
 }
@@ -186,11 +186,11 @@ Arcade::Vect<size_t> Arcade::LibSDL::getScreenSize() const
 bool Arcade::LibSDL::pollEvents()
 {
 	SDL_Event event;
-	SDL_PollEvent(&event);
 
-	if (event.type != 0 && event.key.keysym.sym != 0) {
+	while (SDL_PollEvent(&event) && event.type != 0 &&
+		event.key.keysym.sym != 0) {
 		if (SDL_KEYS_List.find(event.key.keysym.sym) !=
-		    SDL_KEYS_List.end() && event.type != 769) {
+			SDL_KEYS_List.end() && event.type != 769) {
 			this->events.push(
 				SDL_KEYS_List.at(event.key.keysym.sym));
 		}

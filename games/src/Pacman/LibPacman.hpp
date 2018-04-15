@@ -10,9 +10,8 @@
 #include "../IGameLib.hpp"
 #include <algorithm>
 #include <vector>
-#include "time.h"
+#include <ctime>
 #include <thread>
-#include <pthread.h>
 #include <chrono>
 #include <ctime>
 #define MAP_WIDTH 27
@@ -51,9 +50,12 @@ namespace Arcade {
 
 
 	private:
+		enum GHOSTSTATE {
+			CHASING,
+			RUNNING,
+			SLEEPING
+		};
 		size_t score;
-		std::vector<std::pair<int, int>> playerPos;
-		Vect<size_t> objectPos;
 		Vect<size_t> mapSize;
 		void display(IGraphicLib &graphicLib);
 		void drawRectangle(size_t y, size_t x, IGraphicLib &graphicLib,
@@ -68,11 +70,25 @@ namespace Arcade {
 		Keys lastKey;
 		std::chrono::steady_clock::time_point timer;
 		std::chrono::steady_clock::time_point timeDisplay;
+		std::chrono::steady_clock::time_point start;
+		std::chrono::steady_clock::time_point startMoment;
 		double timeSleep;
 		std::pair<int, int> pos;
-		int playerDirection;
 		int lifes;
 		std::vector<std::string> map;
+		bool shouldStop;
+		std::vector<std::pair<int, int>> ghostCoords;
+		std::vector<GHOSTSTATE> ghostStates;
+		void moveGhosts();
+		void updateGhost(int id);
+		std::pair<int, int> determineDirection(int x, int y);
+		void showSmellValues();
+		void resetDoubleVector(std::vector<std::vector<int>> &vector);
+		void spreadSmell(int x, int y, int sv);
+		void afterMovePlayer();
+		std::vector<std::vector<int>> smellValues;
+		std::vector<std::vector<int>> smellPassage;
+		int pacGum();
 	};
 };
 
