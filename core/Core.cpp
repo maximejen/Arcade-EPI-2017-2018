@@ -177,7 +177,6 @@ bool Arcade::Core::checkEvents(Arcade::Keys key)
 		this->graphLoader.loadLib(
 			this->libraryPathes[this->selectedLib % size]);
 		this->graphlib = this->graphLoader.getLibInstance();
-		std::cout << "Switch to : " << this->graphlib->getName() << std::endl;
 		return false;
 	}
 	if (key == Arcade::Keys::O) {

@@ -8,7 +8,6 @@ set(sources
         core/PixelBox.hpp
         core/TextBox.hpp
         core/Vect.hpp
-        main.cpp
         core/ArgParser.cpp
         core/ArgParser.hpp
         core/Core.cpp

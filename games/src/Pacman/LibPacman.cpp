@@ -94,14 +94,14 @@ Arcade::LibPacman::LibPacman()
 	this->timeSleep = 0.6;
 	this->lifes = 3;
 	this->shouldStop = false;
-	this->ghostCoords.emplace_back(12, 12);
-	this->ghostCoords.emplace_back(12, 13);
-	this->ghostCoords.emplace_back(14, 12);
-	this->ghostCoords.emplace_back(14, 13);
-	this->ghostStates.emplace_back(SLEEPING);
-	this->ghostStates.emplace_back(SLEEPING);
-	this->ghostStates.emplace_back(SLEEPING);
-	this->ghostStates.emplace_back(SLEEPING);
+	this->gCoords.emplace_back(12, 12);
+	this->gCoords.emplace_back(12, 13);
+	this->gCoords.emplace_back(14, 12);
+	this->gCoords.emplace_back(14, 13);
+	this->gStates.emplace_back(SLEEPING);
+	this->gStates.emplace_back(SLEEPING);
+	this->gStates.emplace_back(SLEEPING);
+	this->gStates.emplace_back(SLEEPING);
 	this->start = std::chrono::steady_clock::now();
 }
 
@@ -124,7 +124,6 @@ bool Arcade::LibPacman::init()
 
 	this->pos.first = 13;
 	this->pos.second = 20;
-	this->map = PACMAN_MAP;
 	return true;
 }
 
@@ -160,8 +159,15 @@ void Arcade::LibPacman::update()
 void Arcade::LibPacman::refresh(IGraphicLib &graphicLib)
 {
 	Vect<size_t> size = graphicLib.getScreenSize();
-	this->resize.setX(size.getX() / MAP_WIDTH);
-	this->resize.setY(size.getY() / MAP_HEIGHT);
+	if (size.getX() < size.getY()) {
+		this->resize.setY(size.getX() / MAP_WIDTH);
+		this->resize.setX(size.getX() / MAP_HEIGHT);
+	} else {
+		this->resize.setY(size.getY() / MAP_WIDTH);
+		this->resize.setX(size.getY() / MAP_HEIGHT);
+	}
+	if (graphicLib.getName() == "Ncurses")
+		this->resize.setY(this->resize.getY());
 	this->msgScore->setPos({size.getY() / 40, size.getX() / 70});
 	auto t2 = std::chrono::steady_clock::now();
 	auto time_span =
@@ -202,8 +208,8 @@ void Arcade::LibPacman::display(IGraphicLib &graphicLib)
 		true);
 	for (size_t i = 0 ; i < GHOSTS_COLORS.size() ; i++) {
 		this->drawRectangle(
-			static_cast<size_t>(this->ghostCoords[i].first),
-			static_cast<size_t>(this->ghostCoords[i].second),
+			static_cast<size_t>(this->gCoords[i].first),
+			static_cast<size_t>(this->gCoords[i].second),
 			graphicLib, GHOSTS_COLORS[i], true);
 	}
 }
@@ -273,7 +279,7 @@ void Arcade::LibPacman::afterMovePlayer()
 	if (this->checkEnd())
 		this->shouldStop = true;
 	this->resetDoubleVector(this->smellPassage);
-	if (this->ghostStates[0] == RUNNING)
+	if (this->gStates[0] == RUNNING)
 		this->spreadSmell(13, 13, 100);
 	else
 		this->spreadSmell(this->pos.first, this->pos.second, 100);
@@ -286,6 +292,12 @@ bool Arcade::LibPacman::checkEnd()
 
 	if (this->lifes == 0)
 		return true;
+	for (size_t k = 0 ; k < GHOSTS_COLORS.size() ; ++k) {
+		if (this->gCoords[k].first == this->pos.first &&
+			this->gCoords[k].second == this->pos.second &&
+			this->gStates[k] != RUNNING)
+			return true;
+	}
 	for (int j = 0 ; j < MAP_HEIGHT ; j++)
 		for (int i = 0 ; i < MAP_WIDTH ; i++)
 			if (PACMAN_MAP[j][i] == '.')
@@ -318,44 +330,51 @@ void Arcade::LibPacman::moveGhosts()
 {
 	std::pair<int, int> save;
 
-	for (size_t i = 0 ; i < this->ghostCoords.size() ; i++) {
-		save.first = this->ghostCoords[i].first;
-		save.second = this->ghostCoords[i].second;
+	for (size_t i = 0 ; i < this->gCoords.size() ; i++) {
+		save.first = this->gCoords[i].first;
+		save.second = this->gCoords[i].second;
 		this->updateGhost(i);
-		if (this->ghostStates[i] == SLEEPING)
+		if (this->gStates[i] == SLEEPING)
 			continue;
-		auto save1 = this->determineDirection(
-			this->ghostCoords[i].first,
-			this->ghostCoords[i].second);
-		if (this->ghostStates[i] == CHASING) {
-			this->ghostCoords[i].first += save1.first;
-			this->ghostCoords[i].second += save1.second;
+		auto save1 = this->determineDirection(this->gCoords[i].first,
+			this->gCoords[i].second);
+		this->gCoords[i].first += save1.first;
+		this->gCoords[i].second += save1.second;
+		for (size_t j = 0 ; j < GHOSTS_COLORS.size() ; j++) {
+			if (j != i && (this->gCoords[j].first ==
+				this->gCoords[i].first &&
+				this->gCoords[j].second ==
+					this->gCoords[i].second)) {
+				this->gCoords[i].first = save.first;
+				this->gCoords[i].second = save.second;
+			}
 		}
-//		else if (this->ghostStates[i] == RUNNING) {
-//			this->ghostCoords[i].first -= save1.first;
-//			this->ghostCoords[i].second -= save1.second;
-//		}
-		if (this->smellValues[this->ghostCoords[i].second]
-		[this->ghostCoords[i].first] >= 100)
-			this->shouldStop = true;
 	}
 }
 
 void Arcade::LibPacman::updateGhost(int id)
 {
-	auto t2 = std::chrono::steady_clock::now();
+	auto now = std::chrono::steady_clock::now();
 	auto timeSpan =
 		std::chrono::duration_cast<std::chrono::duration<double>>(
-			t2 - this->start);
+			now - this->start);
 	auto timeMoment =
 		std::chrono::duration_cast<std::chrono::duration<double>>(
-			t2 - this->startMoment);
-	if (timeSpan.count() < id * 10 || (int)timeSpan.count() % 60 == 0)
-		this->ghostStates[id] = SLEEPING;
-	else if (this->ghostStates[id] == RUNNING && timeMoment.count() > 20)
-		this->ghostStates[id] = CHASING;
-	else if (this->ghostStates[id] == SLEEPING && timeMoment.count() > 20)
-		this->ghostStates[id] = CHASING;
+			now - this->startMoment);
+	if (this->gStates[id] == SLEEPING) {
+		if (timeMoment.count() > 20)
+			this->gStates[id] = CHASING;
+	} else if (this->gStates[id] == RUNNING) {
+		if (timeMoment.count() > 20) {
+			this->gStates[id] = CHASING;
+			this->start = std::chrono::steady_clock::now();
+		}
+	} else
+		this->gStates[id] = CHASING;
+	if (timeSpan.count() < id * 10)
+		this->gStates[id] = SLEEPING;
+	else if ((int)timeSpan.count() % 60 == 0)
+		this->gStates[id] = SLEEPING;
 }
 
 std::pair<int, int> Arcade::LibPacman::determineDirection(int x, int y)
@@ -417,7 +436,7 @@ int Arcade::LibPacman::pacGum()
 {
 	this->startMoment = std::chrono::steady_clock::now();
 	for (size_t i = 0 ; i < GHOSTS_COLORS.size() ; i++) {
-		this->ghostStates[i] = RUNNING;
+		this->gStates[i] = RUNNING;
 	}
 	return 10;
 }

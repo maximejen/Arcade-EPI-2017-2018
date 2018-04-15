@@ -113,8 +113,6 @@ void Arcade::LibNibbler::setObjectPos()
 {
 	this->objectPos.setY(rand() % MAP_HEIGHT);
 	this->objectPos.setX(rand() % MAP_WIDTH);
-	std::cout << " Pos :" << this->objectPos.getY()
-		<< this->objectPos.getX() << std::endl;
 
 	this->checkSpawnPos();
 }
@@ -152,8 +150,15 @@ void Arcade::LibNibbler::update()
 void Arcade::LibNibbler::refresh(IGraphicLib &graphicLib)
 {
 	Vect<size_t> size = graphicLib.getScreenSize();
-	this->resize.setY(size.getX() / MAP_WIDTH);
-	this->resize.setX(size.getY() / MAP_HEIGHT);
+	if (size.getX() < size.getY()) {
+		this->resize.setY(size.getX() / MAP_WIDTH);
+		this->resize.setX(size.getX() / MAP_HEIGHT);
+	} else {
+		this->resize.setY(size.getY() / MAP_WIDTH);
+		this->resize.setX(size.getY() / MAP_HEIGHT);
+	}
+	if (graphicLib.getName() == "Ncurses")
+		this->resize.setY(this->resize.getY() * 2);
 	this->msgScore->setPos({size.getY() / 40, size.getX() / 70});
 	std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(
@@ -269,7 +274,6 @@ int Arcade::LibNibbler::checkFood(Keys dir)
 
 void Arcade::LibNibbler::movePlayer(Keys dir)
 {
-	std::cout << "key : " << dir << std::endl;
 	if (this->checkFood(dir) == 1) {
 		this->setObjectPos();
 		this->score++;

@@ -55,8 +55,6 @@ namespace Arcade {
 			RUNNING,
 			SLEEPING
 		};
-		size_t score;
-		Vect<size_t> mapSize;
 		void display(IGraphicLib &graphicLib);
 		void drawRectangle(size_t y, size_t x, IGraphicLib &graphicLib,
 			Color color, bool space);
@@ -64,6 +62,16 @@ namespace Arcade {
 		bool checkEnd();
 		void displaymap(IGraphicLib &graphicLib);
 		void drawFood(std::pair<size_t, size_t >, IGraphicLib &graphicLib, Color color, bool type);
+		void moveGhosts();
+		void updateGhost(int id);
+		std::pair<int, int> determineDirection(int x, int y);
+		void showSmellValues();
+		void resetDoubleVector(std::vector<std::vector<int>> &vector);
+		void spreadSmell(int x, int y, int sv);
+		void afterMovePlayer();
+		int pacGum();
+		size_t score;
+		Vect<size_t> mapSize;
 		TextBox *msgScore;
 		Vect<size_t>resize;
 		Keys curKey;
@@ -75,20 +83,11 @@ namespace Arcade {
 		double timeSleep;
 		std::pair<int, int> pos;
 		int lifes;
-		std::vector<std::string> map;
 		bool shouldStop;
-		std::vector<std::pair<int, int>> ghostCoords;
-		std::vector<GHOSTSTATE> ghostStates;
-		void moveGhosts();
-		void updateGhost(int id);
-		std::pair<int, int> determineDirection(int x, int y);
-		void showSmellValues();
-		void resetDoubleVector(std::vector<std::vector<int>> &vector);
-		void spreadSmell(int x, int y, int sv);
-		void afterMovePlayer();
+		std::vector<std::pair<int, int>> gCoords;
+		std::vector<GHOSTSTATE> gStates;
 		std::vector<std::vector<int>> smellValues;
 		std::vector<std::vector<int>> smellPassage;
-		int pacGum();
 	};
 };
 

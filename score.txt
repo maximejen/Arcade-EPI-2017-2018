@@ -14,8 +14,10 @@ max 12
 max 13
 max 16
 max 21
+max 22
 max 23
 max 25
+max 30
 max 31
 max 35
 max 36
@@ -29,3 +31,5 @@ max 57
 max 58
 max 63
 max 64
+max 73
+dams 105
